@@ -1,0 +1,45 @@
+body {
+    background-color: black;
+    /*margin: 0;*/
+    /*display: flex;*/
+
+    /*!* This centers our sketch horizontally. *!*/
+    /*justify-content: center;*/
+
+    /*!* This centers our sketch vertically. *!*/
+    /*align-items: center;*/
+    /*overflow: hidden;*/
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    /*border: 3px solid green;*/
+}
+
+.container {
+    /*height: 100%;*/
+    position: relative;
+    /*border: 3px solid green;*/
+}
+
+canvas {
+    /*display: flex;*/
+    /*justify-content: center;*/
+    /*align-items: center;*/
+    border: 1px solid white
+}
+
+#fps {
+    color: white;
+}
+
+#features {
+    color: white;
+}
+
+#debugArea {
+    color: white;
+}
