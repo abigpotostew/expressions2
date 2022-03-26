@@ -126,6 +126,7 @@ const sketch = (p5) => {
             }
             if(p5.key==='d'){
                 p5.debugDraw = !p5.debugDraw
+                p5.loop()
             }
             // return false;
         };
@@ -141,7 +142,7 @@ const sketch = (p5) => {
             gen(false)
         };
         p5.draw = () => {
-            p5.background(0);
+            p5.background(...p5.sb.randomRgb());
             millis = millis + 1 / p5.frameRate();
             // console.log(p5.frameRate());
 
