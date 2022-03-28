@@ -15,7 +15,8 @@
     "bezier-js": "^6.1.0",
     "jquery": "^3.6.0",
     "p5": "^1.4.0",
-    "polygon-clipping": "^0.15.3"
+    "polygon-clipping": "^0.15.3",
+    "polygon-offset": "^0.3.1"
   },
   "devDependencies": {
     "adm-zip": "^0.5.9",

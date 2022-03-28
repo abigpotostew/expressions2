@@ -36,11 +36,21 @@ export class PolygonXY{
         if(this.options.noStroke){p5.noStroke()}
         
         p5.fill(color);
-        p5.beginShape();
-        for(let i = 0; i < this.points.length; i++){
-            p5.vertex(this.points[i].x, this.points[i].y);
+        if(p5.debugDraw){
+            p5.beginShape();
+            for(let i = 0; i < this.points.length; i++){
+                p5.vertex(this.points[i].x, this.points[i].y);
+            }
+            p5.endShape(p5.CLOSE);
+        }else{
+            p5.curveTightness(0.75);
+            p5.beginShape();
+            for(let i = 0; i < this.points.length; i++){
+                p5.curveVertex(this.points[i].x, this.points[i].y);
+            }
+            p5.endShape(p5.CLOSE);
         }
-        p5.endShape(p5.CLOSE);
+       
         p5.pop()
     }
     getBoundingBox(){
@@ -48,7 +58,7 @@ export class PolygonXY{
     }
 }
 
-export const randomPolygon = (sb, {t,b,l,r}, {resolution, insidePoints})=>{
+export const randomPolygon = (sb, {t,b,l,r}, {resolution, insidePoints, black})=>{
     resolution = resolution || 100;
     const points = [];
     while(resolution--){
@@ -59,6 +69,8 @@ export const randomPolygon = (sb, {t,b,l,r}, {resolution, insidePoints})=>{
         }
     }
     const hull = convexhull.makeHull(points)
-    return new PolygonXY(hull, {fill:sb.randomRgb(), noStroke:true});
+    console.log('hull',hull)
+    //?sb.randomRgb()
+    return new PolygonXY(hull, {fill:black?[0,0,0]:[255,255,255], noStroke:true});
 }
 

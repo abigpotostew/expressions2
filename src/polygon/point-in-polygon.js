@@ -1,8 +1,12 @@
 export function findPointInPolygon(sb, bb, vs, start, end) {
     let point;
+    let iterations = 100;
     do {
         point = [sb.randomInt(bb.l, bb.r), sb.randomInt(bb.t, bb.b)]
-    }while(!pointInPolygon(point, vs, start, end));
+    }while(!pointInPolygon(point, vs, start, end) && iterations--);
+    if(iterations === 0) {
+        throw new Error('Could not find point in polygon');
+    }
     return {x:point[0],y:point[1]};
 }
 
