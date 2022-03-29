@@ -63,13 +63,14 @@ const sketch = (p5) => {
 
             
             const isMultiPolygon = (pg)=>!Number.isFinite(pg[0]?.[0])
-            const generateShape = ({parent, x, y, black}) => {
+            const generateShape = ({parent, x, y, black, w}) => {
+                console.log({w})
                 //takes flat array of object {x,y} points and returns a polygon
                 const bb = parent?.getBoundingBox() || positionToBounds({
                     x: x||p5.sb.randomInt(p5.width * .25, p5.width * .75),
                     y: y||p5.sb.randomInt(p5.height * .25, p5.height * .75),
-                    w: p5.sb.randomInt(p5.width * .35, p5.width * .5) ,
-                    h: p5.sb.randomInt(p5.height * .35,p5.height * .5),
+                    w: p5.sb.randomInt(p5.width * .25, w || p5.width * .5) ,
+                    h: p5.sb.randomInt(p5.height * .25,p5.height * .3),
                 })
                 console.log('bb', bb)
                 let containIn=parent?.points;
@@ -95,24 +96,40 @@ const sketch = (p5) => {
                 return randomPolygon(p5.sb, bb, {resolution, insidePoints: containIn, black})
             }
 
-            const genEye=(x,y)=>{
+            
+            const genEye=(x,y, w, teeth)=>{
                 let prev;
-                let i= p5.sb.randomInt(3, 10);
+                let i= p5.sb.randomInt(2, 15);
                 let black = true;
                 do{
-                    prev = generateShape({parent:prev, x,y, black})
+                    prev = generateShape({parent:prev, x,y, black, w})
                     black = !black;
                     console.log('new shape',prev)
                     polys.drawable.push(prev)
                 }while(--i)
+                if(teeth){
+                    let numTeeth = p5.sb.randomInt(2,8)
+                    for (let j = 0; j < numTeeth; j++) {
+                        const bb =prev.getBoundingBox();
+                        bb.b = bb.t + (bb.b-bb.t)/2;
+                        bb.l = bb.l + (bb.r-bb.l)/numTeeth*j;
+                        bb.r = bb.l + (bb.r-bb.l)/numTeeth*(j+1);
+                        
+                        polys.drawable.push(randomPolygon(p5.sb, bb, {resolution:10, insidePoints: prev.points, black}))
+                    }
+                }
+                return prev;
             }
             let x=p5.width * .25;//p5.sb.randomInt(p5.width * .25, p5.width * .5);
-            let y = p5.height * .25;
+            let y = p5.height * .3;
             genEye(x,y)
             console.log('left eye')
             genEye(p5.width-x,y)
             console.log('right eye')
-            genEye(p5.width*.5,p5.height-y)
+            let mouth = genEye(p5.width*.5,p5.height-y, p5.width*.75, true)
+
+            
+            
             console.log("finished shapes")
 
             // const parent = new PolygonXY(sampleparent);

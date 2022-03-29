@@ -54,7 +54,7 @@ export class PolygonXY{
         p5.pop()
     }
     getBoundingBox(){
-        return this.bb;
+        return new BoundingBox(this.bb);
     }
 }
 
