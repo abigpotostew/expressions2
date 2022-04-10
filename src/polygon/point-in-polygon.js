@@ -1,19 +1,45 @@
 export function findPointInPolygon(sb, bb, vs, start, end) {
     let point;
-    let iterations = 100;
-    do {
-        point = [sb.randomInt(bb.l, bb.r), sb.randomInt(bb.t, bb.b)]
-    }while(!pointInPolygon(point, vs, start, end) && iterations--);
-    if(iterations === 0) {
-        throw new Error('Could not find point in polygon');
+    let points = [];
+    let iterations = 50;
+
+    // for (let i = 0; i <iterations; i++) {
+    //     point = [sb.randomInt(bb.l, bb.r), sb.randomInt(bb.t, bb.b)]
+    //     if(pointInPolygon(point, vs, start, end)){
+    //        break 
+    //     }else if(i === iterations - 1){
+    //         throw new Error('Could not find point in polygon');
+    //     }
+    // }
+
+    // have to call random fixed number of times.
+    for (let i = 0; i < iterations; i++) {
+        points.push([sb.randomInt(Math.floor(bb.l), Math.ceil(bb.r)), sb.randomInt(Math.floor(bb.t), Math.ceil(bb.b))]);
     }
-    return {x:point[0],y:point[1]};
+
+    
+    for (let i = 0; i < points.length; i++) {
+        point = points[i];
+        // console.log('tests ',i)
+        if (pointInPolygon(point, vs, start, end)) {
+            break
+        } else if (i === iterations - 1) {
+            throw new Error('Could not find point in polygon');
+        }
+    }
+    // do {
+    //     point = [sb.randomInt(bb.l, bb.r), sb.randomInt(bb.t, bb.b)]
+    // }while(!pointInPolygon(point, vs, start, end) && iterations--);
+    // if(iterations === 0) {
+    //     throw new Error('Could not find point in polygon');
+    // }
+    return {x: point[0], y: point[1]};
 }
 
 export function pointInPolygon(point, vs, start, end) {
     if (vs.length > 0 && Array.isArray(vs[0])) {
         return pointInPolygonNested(point, vs, start, end);
-    }else if(vs.length>0 && typeof vs[0]==='object'){
+    } else if (vs.length > 0 && typeof vs[0] === 'object') {
         return pointInPolygonObject(point, vs, start, end);
     } else {
         return pointInPolygonFlat(point, vs, start, end);
@@ -51,6 +77,7 @@ function pointInPolygonNested(point, vs, start, end) {
     }
     return inside;
 }
+
 function pointInPolygonObject(point, vs, start, end) {
     var x = point[0], y = point[1];
     var inside = false;

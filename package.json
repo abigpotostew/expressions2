@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "build": "webpack --config ./config/webpack.config.prod.js",
-    "start": "webpack serve --config ./config/webpack.config.dev.js"
+    "start": "webpack serve --config ./config/webpack.config.dev.js",
+    "car": "ipfs-car --pack dist --wrapWithDirectory false --output fwb.car"
   },
   "dependencies": {
     "arbit": "^0.1.1",
