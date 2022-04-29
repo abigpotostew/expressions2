@@ -14,12 +14,14 @@
     "arbit": "^0.1.1",
     "base58-js": "^1.0.0",
     "bezier-js": "^6.1.0",
+    "hull.js": "^1.0.2",
     "jquery": "^3.6.0",
     "p5": "^1.4.0",
     "polygon-clipping": "^0.15.3",
     "polygon-offset": "^0.3.1"
   },
   "devDependencies": {
+    "@types/hull.js": "^1.0.2",
     "adm-zip": "^0.5.9",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.4.0",

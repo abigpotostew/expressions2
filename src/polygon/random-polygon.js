@@ -1,6 +1,8 @@
 import convexhull from "./convex-hull";
 import {findPointInPolygon} from "./point-in-polygon";
 import {BoundingBox} from "./boundingbox";
+import {nestedToObject, objectToNested} from "./util";
+import hull from "hull.js";
 
 export class PolygonXY {
     constructor(points, options) {
@@ -69,7 +71,7 @@ export class PolygonXY {
 }
 
 export const randomPolygon = (sb, {t, b, l, r}, {resolution, insidePoints, black}) => {
-    resolution = 100;//resolution || 100;
+    resolution = resolution || 100;
     const points = [];
     if (insidePoints) {
         while (resolution--) {
@@ -77,13 +79,15 @@ export const randomPolygon = (sb, {t, b, l, r}, {resolution, insidePoints, black
         }
     } else {
         while (resolution--) {
-            points.push({x: sb.randomInt(l, r), y: sb.randomInt(t, b)});
+            points.push({x: sb.random(l, r), y: sb.random(t, b)});
         }
     }
+
     
-    const hull = convexhull.makeHull(points)
+    const  convexHull = hull(objectToNested(points), Number.MAX_SAFE_INTEGER);
+    // const hull = convexhull.makeHull(points)
     // console.log('hull',hull)
     //?sb.randomRgb()
-    return new PolygonXY(hull, {fill: black ? [0, 0, 0] : [255, 255, 255], noStroke: true});
+    return new PolygonXY(nestedToObject(convexHull), {fill: black ? [0, 0, 0] : [255, 255, 255], noStroke: true});
 }
 

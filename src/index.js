@@ -16,6 +16,12 @@ var Offset = require('polygon-offset');
 
 const canvasBorder = 1.0;//0..1
 const isProd = true;
+window.previewReady=false;
+let traits = {};
+// window.getTraits = function(){
+//     return traits;
+// }
+
 const sketch = (p5) => {
         let millis = 0;
         let world = new World();
@@ -23,7 +29,6 @@ const sketch = (p5) => {
         let seed = 0;
         let llcharactersXML;
         let bodyPartsXML;
-        let traits = {}
 
         let polys = {};
         const resetPolys = () => {
@@ -32,7 +37,8 @@ const sketch = (p5) => {
         const gen = (newSeed) => {
             needsRender = true;
             if (newSeed) {
-                seed = new Date().getTime().toString();
+                let alphabet = "123456789ABCDE"
+                seed= Array(64).fill(0).map(_=>alphabet[(Math.random()*alphabet.length)|0]).join('')
             }
             console.log({seed})
             // seed=1648427511445;
@@ -55,14 +61,14 @@ const sketch = (p5) => {
 
 
             const isMultiPolygon = (pg) => !Number.isFinite(pg[0]?.[0])
-            const generateShape = ({parent, x, y, black, w}) => {
+            const generateShape = ({parent, x, y, black, w, resolution}) => {
                 // console.log({w})
                 //takes flat array of object {x,y} points and returns a polygon
                 const rngbb = positionToBounds({
-                    x: x || p5.sb.randomInt(p5.width * .25, p5.width * .75),
-                    y: y || p5.sb.randomInt(p5.height * .25, p5.height * .75),
-                    w: p5.sb.randomInt(p5.width * .25, w || p5.width * .5),
-                    h: p5.sb.randomInt(p5.height * .25, p5.height * .3),
+                    x: x || p5.sb.random(p5.width * .25, p5.width * .75),
+                    y: y || p5.sb.random(p5.height * .25, p5.height * .75),
+                    w: p5.sb.random(p5.width * .25, w || p5.width * .5),
+                    h: p5.sb.random(p5.height * .25, p5.height * .3),
                 })
                 const bb = parent?.getBoundingBox() || rngbb
                 // console.log('bb', bb)
@@ -84,23 +90,26 @@ const sketch = (p5) => {
                 //     containIn = parent.points
                 // }
 
-                const resolution = 50; //p5.sb.randomInt(20,300)
+                const res =p5.sb.randomInt(20,300) 
+                 resolution = resolution || res;
 
                 const insidePoints = containIn;
                 // const insidePoints = undefined;
                 return randomPolygon(p5.sb, bb, {resolution, insidePoints, black})
             }
 
-            const genShape = (x, y, w, n) => {
+            const genShape = (x, y, w, n, resolution) => {
                 let prev;
                 let i = n;//
                 let black = true;
                 do {
-                    prev = generateShape({parent: prev, x, y, black, w})
+                    prev = generateShape({parent: prev, x, y, black, w, resolution})
+                    //prev.points.forEach((p)=>console.log(p))
                     black = !black;
                     // console.log('new shape',prev)
                     polys.drawable.push(prev)
                 } while (--i)
+                
                 return {prev, black};
             }
 
@@ -113,8 +122,9 @@ const sketch = (p5) => {
                 return prev;
             }
             const genEyes = (x, y) => {
-                const ln = p5.sb.randomInt(2, 10);
-                const rn = p5.sb.randomInt(2, 10);
+                
+                const ln = p5.sb.randomInt(1, 10);
+                const rn = p5.sb.randomInt(1, 10);
                 const eye1 = genEye(x, y, ln)
                 // console.log('left eye')
                 const eye2 = genEye(p5.width - x, y, rn)
@@ -122,8 +132,20 @@ const sketch = (p5) => {
             }
             const genMouth = (x, y, w) => {
                 console.log('mouth gen')
-                let n = p5.sb.randomInt(1, 5);
-                let {prev, black} = genShape(x, y, w,n)
+                let n = p5.sb.randomInt(0, 4)*2+1;
+                //all crooked, all random, or all high resolution
+                const teeth = p5.sb.randomList(['thick','crooked','rand'])
+                let resolution=1;
+                switch (teeth) {
+                    case 'thick':
+                        resolution = p5.sb.randomInt(250,300);break;
+                    case 'crooked':
+                        resolution = p5.sb.randomInt(30,100);break;
+                    case 'rand':
+                        resolution = p5.sb.randomInt(50,300);break;
+                    default: throw new Error('missing teeth');
+                }
+                let {prev, black} = genShape(x, y, w,n, resolution)
                 const opts = ['both', 'top', 'bottom', 'none'];
                 const teethOption = opts[Math.floor(mapRange(Math.pow(p5.sb.random(), 1.8), 0, 1, 0, opts.length))];
                 let tTop, tBottom;
@@ -146,7 +168,9 @@ const sketch = (p5) => {
                         bb.l = bb.l + (bb.r - bb.l) / numTeeth * j;
                         bb.r = bb.l + (bb.r - bb.l) / numTeeth * (j + 1);
 
-                        polys.drawable.push(randomPolygon(p5.sb, bb, {resolution: 10, insidePoints: prev.points, black}))
+                        
+                        const teethResolution = Math.floor(Math.pow(p5.sb.random(), 7)*40+10)
+                        polys.drawable.push(randomPolygon(p5.sb, bb, {resolution: teethResolution, insidePoints: prev.points, black}))
                     }
                 }
 
@@ -169,7 +193,7 @@ const sketch = (p5) => {
             console.log('gen mouth!')
             genMouth(p5.width * .5, p5.height - y, p5.width * .75)
 
-            console.log("DEBUG COUNTER", p5.sb.debugCounter)
+            // console.log("DEBUG COUNTER", p5.sb.debugCounter)
 
             // console.log("finished shapes")
 
@@ -273,9 +297,15 @@ const sketch = (p5) => {
             }
             p5.noLoop()
             console.log("finished draw")
-
+            window.attributes = ({'hello':'stew'});
+            window.previewReady=1;
+            console.log({previewReady})
+            
         };
     }
 ;
 
+document.addEventListener('previewReady',()=>{
+    console.log("PREVIEW READY")
+})
 new p5(sketch);

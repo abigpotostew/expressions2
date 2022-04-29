@@ -1,7 +1,7 @@
 export function findPointInPolygon(sb, bb, vs, start, end) {
     let point;
     let points = [];
-    let iterations = 50;
+    let iterations = 100;
 
     // for (let i = 0; i <iterations; i++) {
     //     point = [sb.randomInt(bb.l, bb.r), sb.randomInt(bb.t, bb.b)]
@@ -14,7 +14,8 @@ export function findPointInPolygon(sb, bb, vs, start, end) {
 
     // have to call random fixed number of times.
     for (let i = 0; i < iterations; i++) {
-        points.push([sb.randomInt(Math.floor(bb.l), Math.ceil(bb.r)), sb.randomInt(Math.floor(bb.t), Math.ceil(bb.b))]);
+        points.push([sb.random(bb.l, bb.r), sb.random(bb.t, bb.b)]);
+        // points.push([sb.randomInt(Math.floor(bb.l), Math.ceil(bb.r)), sb.randomInt(Math.floor(bb.t), Math.ceil(bb.b))]);
     }
 
     
