@@ -260,41 +260,63 @@ const sketch = (p5) => {
             gen(false)
 
 
-            const drawPoly = (pg, outlineOnly) => {
-                if (pg[0]?.[0] && !Number.isFinite(pg[0]?.[0])) {
-                    if (!pg.forEach) {
-                        throw new Error("not a polygon")
-                    }
-                    pg.forEach(drawPoly)
+            // const drawPoly = (pg, outlineOnly) => {
+            //     if (pg[0]?.[0] && !Number.isFinite(pg[0]?.[0])) {
+            //         if (!pg.forEach) {
+            //             throw new Error("not a polygon")
+            //         }
+            //         pg.forEach(drawPoly)
+            //     }
+            //     p5.beginShape()
+            //     for (let p of pg) {
+            //         p5.vertex(p[0], p[1])
+            //     }
+            //     p5.endShape(p5.CLOSE)
+            // }
+            // p5.stroke(0, 0, 255)
+            // p5.push()
+            // p5.noFill()
+            //
+            // polys.drawable.forEach(p => p.draw(p5))
+            //
+            // if (p5.debugDraw) {
+            //
+            //     // p5.stroke(255, 255, 0)
+            //     polys.outline.forEach(drawPoly)
+            //     // poly2.forEach(drawPoly)
+            //     p5.fill(255)
+            //     polys.fill.forEach(drawPoly)
+            //     p5.pop()
+            //
+            //
+            //     if (polys.fill.length) {
+            //         setdebugArea(polys.fill[0].length)
+            //         if (polys.fill[0].length === 1)
+            //             console.log("clipped", polys.fill[0])
+            //     }
+            // }
+            
+            // p5.loadPixels()
+            const pixels = p5.pixels
+            const w2 = p5.width/2;
+            const h2 = p5.height/2;
+            p5.noStroke();
+            for (let x = 0; x < p5.width; x++) {
+                for (let y = 0; y < p5.height; y++) {
+                    const dist = Math.abs(w2-x)/w2;
+                    let color = x<=w2 ? p5.color(0,0,0): p5.color(255,255,255)
+                    p5.push()
+                    p5.translate(x,y)
+                    p5.rotate(dist*6.28) // change this for more fun
+                    p5.translate(-x,-y)
+                    p5.fill(color)
+                    p5.ellipse(0,0,2,2)
+                    p5.pop()
+                    // p5.set(x,y,color)
                 }
-                p5.beginShape()
-                for (let p of pg) {
-                    p5.vertex(p[0], p[1])
-                }
-                p5.endShape(p5.CLOSE)
             }
-            p5.stroke(0, 0, 255)
-            p5.push()
-            p5.noFill()
-
-            polys.drawable.forEach(p => p.draw(p5))
-
-            if (p5.debugDraw) {
-
-                // p5.stroke(255, 255, 0)
-                polys.outline.forEach(drawPoly)
-                // poly2.forEach(drawPoly)
-                p5.fill(255)
-                polys.fill.forEach(drawPoly)
-                p5.pop()
-
-
-                if (polys.fill.length) {
-                    setdebugArea(polys.fill[0].length)
-                    if (polys.fill[0].length === 1)
-                        console.log("clipped", polys.fill[0])
-                }
-            }
+            // p5.updatePixels()
+            
             p5.noLoop()
             console.log("finished draw")
             window.attributes = ({'hello':'stew'});
