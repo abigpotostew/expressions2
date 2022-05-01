@@ -2,20 +2,10 @@
 import p5 from "p5";
 import {World} from "./gen-faces.js"
 import {PRNGRand} from "./random";
-import polygonClipping from "polygon-clipping";
 import {randomPolygon} from "./polygon/random-polygon";
 import {positionToBounds} from "./polygon/boundingbox";
-import {nestedToObject, objectToNested} from "./polygon/util";
 import {mapRange} from "./util";
-import {
-    identityMatrix, multiply,
-    multiplyMatrices,
-    multiplyMatrixAndPoint,
-    rotateAroundXAxis,
-    rotateAroundZAxis,
-    translationMatrix
-} from "./matrix/matrix";
-import {mapColor, clamp} from "./gen";
+import {clamp, colorFunctions, mapColorPairs, mappingFunctions} from "./gen";
 // import "p5/lib/addons/p5.dom";
 // // import "p5/lib/addons/p5.sound";	// Include if needed
 // import "./styles.scss";
@@ -25,7 +15,7 @@ var Offset = require('polygon-offset');
 
 const canvasBorder = 1.0;//0..1
 const isProd = true;
-window.previewReady=false;
+window.previewReady = false;
 let traits = {};
 // window.getTraits = function(){
 //     return traits;
@@ -47,7 +37,7 @@ const sketch = (p5) => {
             needsRender = true;
             if (newSeed) {
                 let alphabet = "123456789ABCDE"
-                seed= Array(64).fill(0).map(_=>alphabet[(Math.random()*alphabet.length)|0]).join('')
+                seed = Array(64).fill(0).map(_ => alphabet[(Math.random() * alphabet.length) | 0]).join('')
             }
             console.log({seed})
             // seed=1648427511445;
@@ -99,8 +89,8 @@ const sketch = (p5) => {
                 //     containIn = parent.points
                 // }
 
-                const res =p5.sb.randomInt(20,300) 
-                 resolution = resolution || res;
+                const res = p5.sb.randomInt(20, 300)
+                resolution = resolution || res;
 
                 const insidePoints = containIn;
                 // const insidePoints = undefined;
@@ -118,7 +108,7 @@ const sketch = (p5) => {
                     // console.log('new shape',prev)
                     polys.drawable.push(prev)
                 } while (--i)
-                
+
                 return {prev, black};
             }
 
@@ -131,7 +121,7 @@ const sketch = (p5) => {
                 return prev;
             }
             const genEyes = (x, y) => {
-                
+
                 const ln = p5.sb.randomInt(1, 10);
                 const rn = p5.sb.randomInt(1, 10);
                 const eye1 = genEye(x, y, ln)
@@ -141,20 +131,24 @@ const sketch = (p5) => {
             }
             const genMouth = (x, y, w) => {
                 console.log('mouth gen')
-                let n = p5.sb.randomInt(0, 4)*2+1;
+                let n = p5.sb.randomInt(0, 4) * 2 + 1;
                 //all crooked, all random, or all high resolution
-                const teeth = p5.sb.randomList(['thick','crooked','rand'])
-                let resolution=1;
+                const teeth = p5.sb.randomList(['thick', 'crooked', 'rand'])
+                let resolution = 1;
                 switch (teeth) {
                     case 'thick':
-                        resolution = p5.sb.randomInt(250,300);break;
+                        resolution = p5.sb.randomInt(250, 300);
+                        break;
                     case 'crooked':
-                        resolution = p5.sb.randomInt(30,100);break;
+                        resolution = p5.sb.randomInt(30, 100);
+                        break;
                     case 'rand':
-                        resolution = p5.sb.randomInt(50,300);break;
-                    default: throw new Error('missing teeth');
+                        resolution = p5.sb.randomInt(50, 300);
+                        break;
+                    default:
+                        throw new Error('missing teeth');
                 }
-                let {prev, black} = genShape(x, y, w,n, resolution)
+                let {prev, black} = genShape(x, y, w, n, resolution)
                 const opts = ['both', 'top', 'bottom', 'none'];
                 const teethOption = opts[Math.floor(mapRange(Math.pow(p5.sb.random(), 1.8), 0, 1, 0, opts.length))];
                 let tTop, tBottom;
@@ -177,14 +171,18 @@ const sketch = (p5) => {
                         bb.l = bb.l + (bb.r - bb.l) / numTeeth * j;
                         bb.r = bb.l + (bb.r - bb.l) / numTeeth * (j + 1);
 
-                        
-                        const teethResolution = Math.floor(Math.pow(p5.sb.random(), 7)*40+10)
-                        polys.drawable.push(randomPolygon(p5.sb, bb, {resolution: teethResolution, insidePoints: prev.points, black}))
+
+                        const teethResolution = Math.floor(Math.pow(p5.sb.random(), 7) * 40 + 10)
+                        polys.drawable.push(randomPolygon(p5.sb, bb, {
+                            resolution: teethResolution,
+                            insidePoints: prev.points,
+                            black
+                        }))
                     }
                 }
 
-                const teethTop  = p5.sb.randomInt(2, 8)
-                const teethBottom  = p5.sb.randomInt(3, 8)
+                const teethTop = p5.sb.randomInt(2, 8)
+                const teethBottom = p5.sb.randomInt(3, 8)
                 if (tTop) {
                     makeTeethRow(teethTop, true)
                 }
@@ -261,6 +259,7 @@ const sketch = (p5) => {
         };
         p5.draw = () => {
             p5.background(traits.background);
+            p5.background(0);
             millis = millis + 1 / p5.frameRate();
             // console.log(p5.frameRate());
 
@@ -304,50 +303,52 @@ const sketch = (p5) => {
             //             console.log("clipped", polys.fill[0])
             //     }
             // }
-            
+
             p5.loadPixels()
             // const pixels = p5.pixels
-            const w2 = p5.width/2;
-            const h2 = p5.height/2;
+            const w2 = p5.width / 2;
+            const h2 = p5.height / 2;
             p5.noStroke();
-            const mouse=[p5.mouseX/p5.width ,p5.mouseY/p5.height];
+            const mouse = [p5.mouseX / p5.width, p5.mouseY / p5.height];
+            p5.normalizedMouse = mouse;
             const colors = [
-                p5.color(200,200,240),
+                p5.color(100, 100, 240),
+                // p5.color(255, 0, 0),
+                // p5.color(255, 255, 0),
                 p5.color(255),
-                p5.color(255,0,0),
-                p5.color(255,255,0),
+                p5.color(255, 0, 0),
+                p5.color(255, 255, 0),
+                
+                p5.color(255, 0, 255),
+                p5.color(0, 0, 255),
             ]
+            //todo draw it over time using random point x, y
             for (let y = 0; y < p5.height; y++) {
-            for (let x = 0; x < p5.width; x++) {
-                let xi = (x/p5.width-0.5)*2.0
-                let yi = (y/p5.height-0.5)*2.0
-                const dist = p5.dist(xi,yi,0,0);
-                
-                
-                const scalar = (0.5-dist)*200.0;
-                const p = multiply( [
-                    rotateAroundZAxis(dist*(mouse[0]*scalar)*1.1),
-                ],[xi,yi]);
-                let color;
-               
-                color = mapColor(p5, clamp((p[1]+1)/2 ), colors)
-
-                p5.set(x,y,color)
+                for (let x = 0; x < p5.width; x++) {
+                    // let xi = (x / p5.width - 0.5) * 2.0
+                    // let yi = (y / p5.height - 0.5) * 2.0
+                    const p = mappingFunctions.hills(p5, x, y)
+                    // let color = mapColorPairs(p5, ((p[1] + 1) / 2), colors)
+                    let color = colorFunctions.twoGradientY(p5,p , colors)
+                    if(color) {
+                        // let color = colorFunctions.debug(p5,p , colors)
+                        p5.set(x, y, color)
+                    }
                 }
             }
             p5.updatePixels()
-            
+
             // p5.noLoop()
             // console.log("finished draw")
-            window.attributes = ({'hello':'stew'});
-            window.previewReady=1;
+            window.attributes = ({'hello': 'stew'});
+            window.previewReady = 1;
             // console.log({previewReady})
-            
+
         };
     }
 ;
 
-document.addEventListener('previewReady',()=>{
+document.addEventListener('previewReady', () => {
     console.log("PREVIEW READY")
 })
 new p5(sketch);
