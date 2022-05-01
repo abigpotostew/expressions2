@@ -7,6 +7,14 @@ import {randomPolygon} from "./polygon/random-polygon";
 import {positionToBounds} from "./polygon/boundingbox";
 import {nestedToObject, objectToNested} from "./polygon/util";
 import {mapRange} from "./util";
+import {
+    identityMatrix,
+    multiplyMatrices,
+    multiplyMatrixAndPoint,
+    rotateAroundXAxis,
+    rotateAroundZAxis,
+    translationMatrix
+} from "./matrix/matrix";
 // import "p5/lib/addons/p5.dom";
 // // import "p5/lib/addons/p5.sound";	// Include if needed
 // import "./styles.scss";
@@ -296,28 +304,47 @@ const sketch = (p5) => {
             //     }
             // }
             
-            // p5.loadPixels()
-            const pixels = p5.pixels
+            p5.loadPixels()
+            // const pixels = p5.pixels
             const w2 = p5.width/2;
             const h2 = p5.height/2;
             p5.noStroke();
+            for (let y = 0; y < p5.height; y++) {
             for (let x = 0; x < p5.width; x++) {
-                for (let y = 0; y < p5.height; y++) {
-                    const dist = Math.abs(w2-x)/w2;
-                    let color = x<=w2 ? p5.color(0,0,0): p5.color(255,255,255)
-                    p5.push()
-                    p5.translate(x,y)
-                    p5.rotate(dist*6.28) // change this for more fun
-                    p5.translate(-x,-y)
-                    p5.fill(color)
-                    p5.ellipse(0,0,2,2)
-                    p5.pop()
+                let xi = (x/p5.width-0.5)*0.5
+                let yi = (y/p5.height-0.5)*0.5
+                    // const angle = p5.atan2(yi,xi);
+                    const dist = p5.dist(xi,yi,0,0);
+                    // const dist = Math.abs(w2-x)/w2;
+                    
+                    // p5.push()
+                
+                const p = multiplyMatrixAndPoint(
+                    //translationMatrix(w2,h2,0,0)
+                    multiplyMatrices(identityMatrix, rotateAroundZAxis(dist*p5.mouseX/5.0))
+                    // rotateAroundZAxis(dist*p5.mouseX/5.0)
+                    , [x,y])
+                let color;
+                if(p[0] <= w2 ){
+                    color = p5.color(0,0,0)
+                }else{
+                    color  = p5.color(255,255,255)
+                }
+                // let color = p[0]<=w2 ? p5.color(0,0,0): p5.color(255,255,255)
+                    // p5.translate(w2,h2)
+                    // p5.rotate(dist*6.28) // change this for more fun
+                    // p5.translate(-w2,-h2)
+                p5.set(x,y,color)
+                    // p5.fill(color)
+                
+                    // p5.ellipse(x,y,1,1)
+                    // p5.pop()
                     // p5.set(x,y,color)
                 }
             }
-            // p5.updatePixels()
+            p5.updatePixels()
             
-            p5.noLoop()
+            // p5.noLoop()
             console.log("finished draw")
             window.attributes = ({'hello':'stew'});
             window.previewReady=1;
