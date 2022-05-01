@@ -1,6 +1,6 @@
 // import P5 from "p5";
 import p5 from "p5";
-import {World} from "./gen.js"
+import {World} from "./gen-faces.js"
 import {PRNGRand} from "./random";
 import polygonClipping from "polygon-clipping";
 import {randomPolygon} from "./polygon/random-polygon";
@@ -8,13 +8,14 @@ import {positionToBounds} from "./polygon/boundingbox";
 import {nestedToObject, objectToNested} from "./polygon/util";
 import {mapRange} from "./util";
 import {
-    identityMatrix,
+    identityMatrix, multiply,
     multiplyMatrices,
     multiplyMatrixAndPoint,
     rotateAroundXAxis,
     rotateAroundZAxis,
     translationMatrix
 } from "./matrix/matrix";
+import {mapColor, clamp} from "./gen";
 // import "p5/lib/addons/p5.dom";
 // // import "p5/lib/addons/p5.sound";	// Include if needed
 // import "./styles.scss";
@@ -218,7 +219,7 @@ const sketch = (p5) => {
             const s = Math.min(p5.windowHeight, p5.windowWidth) * canvasBorder
             canvas = p5.createCanvas(s, s); // p5.windowWidth, p5.windowHeight);
 
-            // p5.pixelDensity(2)
+            p5.pixelDensity(1)
             // p5.colorMode(p5.HSB)
             canvas.parent("sketch");
 
@@ -265,7 +266,7 @@ const sketch = (p5) => {
 
             document.getElementById("fps").innerText = p5.frameRate().toFixed(0);
 
-            gen(false)
+            // gen(false)
 
 
             // const drawPoly = (pg, outlineOnly) => {
@@ -309,46 +310,38 @@ const sketch = (p5) => {
             const w2 = p5.width/2;
             const h2 = p5.height/2;
             p5.noStroke();
+            const mouse=[p5.mouseX/p5.width ,p5.mouseY/p5.height];
+            const colors = [
+                p5.color(200,200,240),
+                p5.color(255),
+                p5.color(255,0,0),
+                p5.color(255,255,0),
+            ]
             for (let y = 0; y < p5.height; y++) {
             for (let x = 0; x < p5.width; x++) {
-                let xi = (x/p5.width-0.5)*0.5
-                let yi = (y/p5.height-0.5)*0.5
-                    // const angle = p5.atan2(yi,xi);
-                    const dist = p5.dist(xi,yi,0,0);
-                    // const dist = Math.abs(w2-x)/w2;
-                    
-                    // p5.push()
+                let xi = (x/p5.width-0.5)*2.0
+                let yi = (y/p5.height-0.5)*2.0
+                const dist = p5.dist(xi,yi,0,0);
                 
-                const p = multiplyMatrixAndPoint(
-                    //translationMatrix(w2,h2,0,0)
-                    multiplyMatrices(identityMatrix, rotateAroundZAxis(dist*p5.mouseX/5.0))
-                    // rotateAroundZAxis(dist*p5.mouseX/5.0)
-                    , [x,y])
+                
+                const scalar = (0.5-dist)*200.0;
+                const p = multiply( [
+                    rotateAroundZAxis(dist*(mouse[0]*scalar)*1.1),
+                ],[xi,yi]);
                 let color;
-                if(p[0] <= w2 ){
-                    color = p5.color(0,0,0)
-                }else{
-                    color  = p5.color(255,255,255)
-                }
-                // let color = p[0]<=w2 ? p5.color(0,0,0): p5.color(255,255,255)
-                    // p5.translate(w2,h2)
-                    // p5.rotate(dist*6.28) // change this for more fun
-                    // p5.translate(-w2,-h2)
+               
+                color = mapColor(p5, clamp((p[1]+1)/2 ), colors)
+
                 p5.set(x,y,color)
-                    // p5.fill(color)
-                
-                    // p5.ellipse(x,y,1,1)
-                    // p5.pop()
-                    // p5.set(x,y,color)
                 }
             }
             p5.updatePixels()
             
             // p5.noLoop()
-            console.log("finished draw")
+            // console.log("finished draw")
             window.attributes = ({'hello':'stew'});
             window.previewReady=1;
-            console.log({previewReady})
+            // console.log({previewReady})
             
         };
     }

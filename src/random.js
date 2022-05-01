@@ -84,7 +84,6 @@ export class PRNGRand {
             return ab.random_dec()
         }
         // this.grand = new Alea(seed)
-        this.intrand = this.grand.uint32;
         this.debugCounter= 0;
     }
 

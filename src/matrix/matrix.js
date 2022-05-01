@@ -1,11 +1,11 @@
 
 
-export const identityMatrix = [
+export const identityMatrix= () => ([
     1, 0, 0, 0,
     0, 1, 0, 0,
     0, 0, 1, 0,
     0, 0, 0, 1
-];
+]);
 
 // Returns a new array equivalent to someMatrix
 
@@ -96,4 +96,24 @@ export function multiplyMatrixAndPoint(matrix, point=[]) {
     let resultW = (x * c3r0) + (y * c3r1) + (z * c3r2) + (w * c3r3);
 
     return [resultX, resultY, resultZ, resultW];
+}
+
+// class MatrixChain{
+//     constructor(m) {
+//         this.m=m;
+//     }
+//     get(){
+//         return this.m;
+//     }
+//     mult(m){
+//         return new MatrixChain()
+//     }
+// }
+
+export const multiply=(matrices, point=[])=>{
+    let m = identityMatrix();
+    for (let matrix of matrices) {
+        m = multiplyMatrices(m, matrix)
+    }
+    return multiplyMatrixAndPoint(m,point)
 }
