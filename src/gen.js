@@ -81,7 +81,7 @@ const hills = (p5, x, y) => {
 
 const matrix_apply = (p5, x, y, getMatrix) => {
     x = (x / p5.width)
-    y = 1-(y / p5.height)
+    y = (y / p5.height)
 
     const p = multiply(getMatrix(x, y), [x, y])
     // if(p[1] < 0.5) return null;

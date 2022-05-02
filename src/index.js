@@ -29,21 +29,30 @@ const sketch = (p5) => {
         let seed = 0;
         let llcharactersXML;
         let bodyPartsXML;
-
+        let pixelsToDrawn;
+        let randerRand;
+let genTime;
         let polys = {};
         const resetPolys = () => {
             polys = {outline: [], fill: [], drawable: []}
         };
         const gen = (newSeed) => {
+            
             needsRender = true;
             if (newSeed) {
+
+                randerRand = new PRNGRand(seed)
+                pixelsToDrawn = [...Array(p5.width*p5.height).keys()];
+                // pixelsToDrawn.forEach((v,i,l)=>l[i]=i);
+                genTime = p5.millis()/1000
+                p5.background(200);
                 let alphabet = "123456789ABCDE"
                 seed = Array(64).fill(0).map(_ => alphabet[(Math.random() * alphabet.length) | 0]).join('')
+                console.log({seed})
             }
-            console.log({seed})
             // seed=1648427511445;
             p5.sb = new PRNGRand(seed)
-            console.log({seed})
+            
             return;
             // let settings = getFeatures(p5.sb);
 
@@ -136,7 +145,7 @@ const sketch = (p5) => {
                 let n = p5.sb.randomInt(0, 4) * 2 + 1;
                 //all crooked, all random, or all high resolution
                 const teeth = p5.sb.randomList(['thick', 'crooked', 'rand'])
-                let resolution = 1;
+                let resolution = 1; 
                 switch (teeth) {
                     case 'thick':
                         resolution = p5.sb.randomInt(250, 300);
@@ -195,12 +204,12 @@ const sketch = (p5) => {
 
                 return prev;
             }
-            traits.background = p5.sb.randomRgb();
-            let x = p5.width * .25;//p5.sb.randomInt(p5.width * .25, p5.width * .5);
-            let y = p5.height * .3;
-            genEyes(x, y)
-            console.log('gen mouth!')
-            genMouth(p5.width * .5, p5.height - y, p5.width * .75)
+            // traits.background = p5.sb.randomRgb();
+            // let x = p5.width * .25;//p5.sb.randomInt(p5.width * .25, p5.width * .5);
+            // let y = p5.height * .3;
+            // genEyes(x, y)
+            // console.log('gen mouth!')
+            // genMouth(p5.width * .5, p5.height - y, p5.width * .75)
 
             // console.log("DEBUG COUNTER", p5.sb.debugCounter)
 
@@ -261,11 +270,14 @@ const sketch = (p5) => {
             gen(false)
         };
         p5.draw = () => {
+
+            gen(false)
             // p5.background(traits.background);
-            p5.background(0);
+            // p5.background(0);
             millis = millis + 1 / p5.frameRate();
             // console.log(p5.frameRate());
 
+            
             document.getElementById("fps").innerText = p5.frameRate().toFixed(0);
 
             // gen(false)
@@ -348,12 +360,28 @@ const sketch = (p5) => {
                     ]
                 }
             }
+
+            const steep_landscape = (offset = 1) => {
+                const sy = p5.sb.random()*0.1
+                return (x, y) => {
+                    let ss = p5.sin(x * 10.28 )* 0.2
+                    ss += p5.sin(x * 20.28 ) * 0.07
+                    ss += p5.sin(x * 40.28 ) * 0.04
+                    ss += sy;
+                    ss *= 0.25
+                    return [
+                        // rotateAroundZAxis(0.1 + p5.sin(x * 3.28 + mouse[0] * 100))
+                        //+ p5.sin(ss)*0.9+1.0 -1.5
+                         translationMatrix(0, Math.pow(x-0.5,2) , 0)
+                        // , scaleMatrix(1, 1.125)
+                    ]
+                }
+            }
             
-            let timeDraw = p5.millis()/1000;
+            let timeDraw = genTime;
 
             let hill_offset = p5.sb.random(4.4, 6.4);
 
-            let maxSs = -1000;
             const soft_hill_gen2 = (offset) => {
                 const sy = hill_offset * p5.sb.random() * 0.2
 
@@ -364,14 +392,13 @@ const sketch = (p5) => {
                     ss += p5.sin(x * 40.28 + timeDraw) * 0.07
                     ss *= 0.25
                     ss += sy;
-                    if(ss>maxSs)maxSs=ss;
                     return [
                         translationMatrix(.5, .5, 0),
                         rotateAroundZAxis(ss),
 
                         translationMatrix(-0.5, -0.5)
                         // , translationMatrix(0, -1.955+0.5*offset, 0)
-                        , translationMatrix(0, .3 * offset + -0.75, 0)
+                        , translationMatrix(0, .1 * offset + -0.75, 0)
                         , scaleMatrix(1, 3.125)
                     ]
                 }
@@ -387,9 +414,9 @@ const sketch = (p5) => {
             }
 
             const colorsBg = [colors[0], colors[1]]
-            const colorsFg = [colors[2], colors[3], [], []]
-            const colorsFg2 = [colors[4], colors[5], [], []]
-            const colorsFg3 = [colors[6], colors[7], [], []]
+            const colorsFg = [colors[2], colors[3], colors[3],colors[3]]
+            const colorsFg2 = [colors[4], colors[5], colors[5], colors[5]]
+            const colorsFg3 = [colors[6], colors[7], colors[7],colors[7]]
             
             const allColors = [
                 [colors[0], colors[1]],
@@ -397,13 +424,24 @@ const sketch = (p5) => {
                     [colors[4], colors[5], [], []],
                 [colors[6], colors[7], [], []],
                 ];
-            let layers = [
+            let bgLayers = [
                 layer(soft_hill_gen2, null, colorFunctions.twoGradientY, colorsBg),
-                layer(soft_hill_gen2, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
-                layer(soft_hill_gen2, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
-                layer(soft_hill_gen2, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
-                layer(soft_hill_gen2, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
+                layer(steep_landscape, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
             ].map((l, i, m) => {l.matrix = l.matrix(i, i / m.length); return l;})
+            let layers = [];
+            let n = 10;
+            for (let i = 0; i < n; i++) {
+                let l = layer(soft_hill_gen2, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors));
+                l.matrix = l.matrix(i, i / n);
+                layers.push(l)
+            }
+            // let layers = [
+            //     layer(soft_hill_gen2, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
+            //     layer(soft_hill_gen2, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
+            //     layer(soft_hill_gen2, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
+            //     layer(soft_hill_gen2, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
+            //    
+            // ].map((l, i, m) => {l.matrix = l.matrix(i, i / m.length); return l;})
 
             // let soft_hills = soft_hill_gen2(1,num_layers)
             // let soft_hills2 =soft_hill_gen2(2,num_layers)
@@ -418,44 +456,84 @@ const sketch = (p5) => {
 
             layers.reverse()
             //todo draw it over time using random point x, y
-            for (let y = 0; y < p5.height; y++) {
-                for (let x = 0; x < p5.width; x++) {
-                    // let xi = (x / p5.width - 0.5) * 2.0
-                    // let yi = (y / p5.height - 0.5) * 2.0
-                    let p, color;
 
-                    for (let layer of layers) {
-                        p = mappingFunctions.matrix_apply(p5, x, y, layer.matrix)
-                        if (layer.filter && !!p) p = filterFunctions.filter_apply(p5, p, layer.filter)
-                        if (p) color = layer.color(p5, p, layer.colors)
-                        if (color) {
-                            p5.set(x, y, color)
-                            break;
-                        }
+
+            let numRender = Math.min(pixelsToDrawn.length, 10000)
+            // let rendered=[];
+            for (let i = 0; i < numRender; i++) {
+                let index = randerRand.random(0,pixelsToDrawn.length-1)
+                let drawi = pixelsToDrawn[index]
+                pixelsToDrawn[index] = null
+                // let j = sb.randomInt(0,numRender)
+                let x = drawi%p5.width;
+                let y = (drawi-x)/p5.width;
+                    // let y = (drawi-p5.width)/p5.width;
+                // let x = Math.floor(Math.random() * p5.width);
+                // let y = Math.floor(Math.random() * p5.height);
+                
+                // for (let y = 0; y < p5.height; y++) {
+                //     for (let x = 0; x < p5.width; x++) {
+                // let xi = (x / p5.width - 0.5) * 2.0
+                // let yi = (y / p5.height - 0.5) * 2.0
+                let p, color;
+
+
+                p=null;color=null
+                for (let layer of bgLayers) {
+                    p = mappingFunctions.matrix_apply(p5, x, y, layer.matrix)
+                    if (layer.filter && !!p) p = filterFunctions.filter_apply(p5, p, layer.filter)
+                    if (p) color = layer.color(p5, p, layer.colors)
+                    if (color) {
+                        p5.set(x, y, color)
+                        // break;
                     }
-                    //  p = mappingFunctions.matrix_apply(p5, x, y, layers[0])
-                    //  // p = filterFunctions.filter_apply(p5, p, filterFunctions.isY_gt(0.5))
-                    // if(p) color = colorFunctions.twoGradientY(p5, p, colorsBg)
-                    // if(color) {
-                    //     p5.set(x, y, color)
-                    // }
-                    //
-                    // p = mappingFunctions.matrix_apply(p5, x, y, layers[1])
-                    // p = filterFunctions.filter_apply(p5, p, filterFunctions.isY_lt(0.5))
-                    // if(p) color = colorFunctions.twoGradientY(p5, p, colorsFg)
-                    // if(color) {
-                    //     p5.set(x, y, color)
-                    // }
-                    //
-                    // p = mappingFunctions.matrix_apply(p5, x, y, layers[2])
-                    // p = filterFunctions.filter_apply(p5, p, filterFunctions.isY_lt(0.5))
-                    // if(p) color = colorFunctions.twoGradientY(p5, p, colorsFg2)
-                    // if(color) {
-                    //     p5.set(x, y, color)
-                    // }
+                }
+                p=null;color=null
+                for (let layer of layers) {
+                    p = mappingFunctions.matrix_apply(p5, x, y, layer.matrix)
+                    if (layer.filter && !!p) p = filterFunctions.filter_apply(p5, p, layer.filter)
+                    if (p) color = layer.color(p5, p, layer.colors)
+                    if (color) {
+                        p5.set(x, y, color)
+                        break;
+                    }
+                }
+                //  p = mappingFunctions.matrix_apply(p5, x, y, layers[0])
+                //  // p = filterFunctions.filter_apply(p5, p, filterFunctions.isY_gt(0.5))
+                // if(p) color = colorFunctions.twoGradientY(p5, p, colorsBg)
+                // if(color) {
+                //     p5.set(x, y, color)
+                // }
+                //
+                // p = mappingFunctions.matrix_apply(p5, x, y, layers[1])
+                // p = filterFunctions.filter_apply(p5, p, filterFunctions.isY_lt(0.5))
+                // if(p) color = colorFunctions.twoGradientY(p5, p, colorsFg)
+                // if(color) {
+                //     p5.set(x, y, color)
+                // }
+                //
+                // p = mappingFunctions.matrix_apply(p5, x, y, layers[2])
+                // p = filterFunctions.filter_apply(p5, p, filterFunctions.isY_lt(0.5))
+                // if(p) color = colorFunctions.twoGradientY(p5, p, colorsFg2)
+                // if(color) {
+                //     p5.set(x, y, color)
+                // }
+
+
+                // }
+                // }
+            }
+            var i = pixelsToDrawn.length
+            while (i--) {
+            
+                if (pixelsToDrawn[i]===null) {
+                    pixelsToDrawn.splice(i, 1);
                 }
             }
-            console.log({maxSs})
+            // pixelsToDrawn= pixelsToDrawn.filter(i=>i!==null)
+            console.log(pixelsToDrawn.length)
+            
+            // console.log({maxSs})
             p5.updatePixels()
 
             // p5.noLoop()

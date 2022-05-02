@@ -122,8 +122,13 @@ export function multiplyMatrixAndPoint(matrix, point=[]) {
 
 export const multiply=(matrices, point=[])=>{
     let m = identityMatrix();
-    for (let matrix of matrices) {
-        m = multiplyMatrices(m, matrix)
+    try {
+        for (let matrix of matrices) {
+            if (!matrix) throw new Error('matrix is null or missing')
+            m = multiplyMatrices(m, matrix)
+        }
+    }catch (e) {
+        e;
     }
     return multiplyMatrixAndPoint(m,point)
 }
