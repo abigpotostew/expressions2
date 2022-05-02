@@ -47,6 +47,16 @@ export function translationMatrix(x=0,y=0,z=0){
 
 }
 
+export function scaleMatrix (w=1,h=1,d=1){
+
+    return [
+        w,    0,    0,   0,
+        0,    h,    0,   0,
+        0,    0,    d,   0,
+        0,    0,    0,   1
+    ];
+}
+
 //matrixB • matrixA
 export function multiplyMatrices(matrixA, matrixB) {
     // Slice the second matrix up into rows

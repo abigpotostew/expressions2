@@ -5,7 +5,8 @@ import {PRNGRand} from "./random";
 import {randomPolygon} from "./polygon/random-polygon";
 import {positionToBounds} from "./polygon/boundingbox";
 import {mapRange} from "./util";
-import {clamp, colorFunctions, mapColorPairs, mappingFunctions} from "./gen";
+import {colorFunctions, filterFunctions, mappingFunctions} from "./gen";
+import {rotateAroundZAxis, scaleMatrix, translationMatrix} from "./matrix/matrix";
 // import "p5/lib/addons/p5.dom";
 // // import "p5/lib/addons/p5.sound";	// Include if needed
 // import "./styles.scss";
@@ -43,6 +44,7 @@ const sketch = (p5) => {
             // seed=1648427511445;
             p5.sb = new PRNGRand(seed)
             console.log({seed})
+            return;
             // let settings = getFeatures(p5.sb);
 
             // console.log("seed", seed)
@@ -220,7 +222,8 @@ const sketch = (p5) => {
             p5.pixelDensity(1)
             // p5.colorMode(p5.HSB)
             canvas.parent("sketch");
-
+            // p5.smooth(8);
+            //
             const seedQp = new URL(window.location.href).searchParams.get("hash")
 
             if (seedQp) {
@@ -258,7 +261,7 @@ const sketch = (p5) => {
             gen(false)
         };
         p5.draw = () => {
-            p5.background(traits.background);
+            // p5.background(traits.background);
             p5.background(0);
             millis = millis + 1 / p5.frameRate();
             // console.log(p5.frameRate());
@@ -312,30 +315,147 @@ const sketch = (p5) => {
             const mouse = [p5.mouseX / p5.width, p5.mouseY / p5.height];
             p5.normalizedMouse = mouse;
             const colors = [
-                p5.color(100, 100, 240),
+                p5.color('#F94B42'),
+                p5.color('#ff5c39'),
+                // p5.color('#337a6e'),
+                // p5.color('#ff5c39'),
                 // p5.color(255, 0, 0),
                 // p5.color(255, 255, 0),
-                p5.color(255),
-                p5.color(255, 0, 0),
-                p5.color(255, 255, 0),
+                // p5.color('#3f27bb'),
+                // p5.color('#5842C8'),
+                p5.color('#f3c0ae'),
+                p5.color('#f3dddd'),
+
+                p5.color('#e3f1b2'),
+                p5.color('#f3f8e2'),
                 
-                p5.color(255, 0, 255),
-                p5.color(0, 0, 255),
+                p5.color('#c1e8f1'),
+                p5.color('#d6e6ea'),
+                // p5.color(255, 0, 0),
+                // p5.color(255, 255, 0),
+
+                // p5.color(255, 0, 255),
+                // p5.color(0, 0, 255),
             ]
+
+            const soft_hill_gen = (offset = 1) => {
+                const sy = p5.sb.random()
+                return (x, y) => {
+                    return [
+                        rotateAroundZAxis(0.1 + p5.sin(x * 3.28 + mouse[0] * 100))
+                        , translationMatrix(0, -1.955 + 0.5 * offset, 0)
+                        , scaleMatrix(1, 9.125)
+                    ]
+                }
+            }
+            
+            let timeDraw = p5.millis()/1000;
+
+            let hill_offset = p5.sb.random(4.4, 6.4);
+
+            let maxSs = -1000;
+            const soft_hill_gen2 = (offset) => {
+                const sy = hill_offset * p5.sb.random() * 0.2
+
+                
+                return (x, y) => {
+                    let ss = p5.sin(x * 10.28 + timeDraw) * 0.3
+                    ss += p5.sin(x * 20.28 + timeDraw) * 0.15
+                    ss += p5.sin(x * 40.28 + timeDraw) * 0.07
+                    ss *= 0.25
+                    ss += sy;
+                    if(ss>maxSs)maxSs=ss;
+                    return [
+                        translationMatrix(.5, .5, 0),
+                        rotateAroundZAxis(ss),
+
+                        translationMatrix(-0.5, -0.5)
+                        // , translationMatrix(0, -1.955+0.5*offset, 0)
+                        , translationMatrix(0, .3 * offset + -0.75, 0)
+                        , scaleMatrix(1, 3.125)
+                    ]
+                }
+            }
+
+            const layer = (matrix_fn, filter_fn, color_fn, colors) => {
+                return {
+                    matrix: matrix_fn,
+                    filter: filter_fn,
+                    color: color_fn,
+                    colors: colors
+                }
+            }
+
+            const colorsBg = [colors[0], colors[1]]
+            const colorsFg = [colors[2], colors[3], [], []]
+            const colorsFg2 = [colors[4], colors[5], [], []]
+            const colorsFg3 = [colors[6], colors[7], [], []]
+            
+            const allColors = [
+                [colors[0], colors[1]],
+                [colors[2], colors[3], [], []],
+                    [colors[4], colors[5], [], []],
+                [colors[6], colors[7], [], []],
+                ];
+            let layers = [
+                layer(soft_hill_gen2, null, colorFunctions.twoGradientY, colorsBg),
+                layer(soft_hill_gen2, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
+                layer(soft_hill_gen2, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
+                layer(soft_hill_gen2, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
+                layer(soft_hill_gen2, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
+            ].map((l, i, m) => {l.matrix = l.matrix(i, i / m.length); return l;})
+
+            // let soft_hills = soft_hill_gen2(1,num_layers)
+            // let soft_hills2 =soft_hill_gen2(2,num_layers)
+            //     (x,y)=>{
+            //     return [rotateAroundZAxis(0.1 +
+            //         ((p5.sin(2*x * 3.28)+p5.sin(1.356*x * 3.28))*0.5)+0.5
+            //     )
+            //         , translationMatrix(0, -.0955, 0)
+            //         , scaleMatrix(1, 19.125)
+            //     ]
+            // }
+
+            layers.reverse()
             //todo draw it over time using random point x, y
             for (let y = 0; y < p5.height; y++) {
                 for (let x = 0; x < p5.width; x++) {
                     // let xi = (x / p5.width - 0.5) * 2.0
                     // let yi = (y / p5.height - 0.5) * 2.0
-                    const p = mappingFunctions.hills(p5, x, y)
-                    // let color = mapColorPairs(p5, ((p[1] + 1) / 2), colors)
-                    let color = colorFunctions.twoGradientY(p5,p , colors)
-                    if(color) {
-                        // let color = colorFunctions.debug(p5,p , colors)
-                        p5.set(x, y, color)
+                    let p, color;
+
+                    for (let layer of layers) {
+                        p = mappingFunctions.matrix_apply(p5, x, y, layer.matrix)
+                        if (layer.filter && !!p) p = filterFunctions.filter_apply(p5, p, layer.filter)
+                        if (p) color = layer.color(p5, p, layer.colors)
+                        if (color) {
+                            p5.set(x, y, color)
+                            break;
+                        }
                     }
+                    //  p = mappingFunctions.matrix_apply(p5, x, y, layers[0])
+                    //  // p = filterFunctions.filter_apply(p5, p, filterFunctions.isY_gt(0.5))
+                    // if(p) color = colorFunctions.twoGradientY(p5, p, colorsBg)
+                    // if(color) {
+                    //     p5.set(x, y, color)
+                    // }
+                    //
+                    // p = mappingFunctions.matrix_apply(p5, x, y, layers[1])
+                    // p = filterFunctions.filter_apply(p5, p, filterFunctions.isY_lt(0.5))
+                    // if(p) color = colorFunctions.twoGradientY(p5, p, colorsFg)
+                    // if(color) {
+                    //     p5.set(x, y, color)
+                    // }
+                    //
+                    // p = mappingFunctions.matrix_apply(p5, x, y, layers[2])
+                    // p = filterFunctions.filter_apply(p5, p, filterFunctions.isY_lt(0.5))
+                    // if(p) color = colorFunctions.twoGradientY(p5, p, colorsFg2)
+                    // if(color) {
+                    //     p5.set(x, y, color)
+                    // }
                 }
             }
+            console.log({maxSs})
             p5.updatePixels()
 
             // p5.noLoop()
