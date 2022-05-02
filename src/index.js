@@ -429,7 +429,7 @@ let genTime;
                 layer(steep_landscape, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
             ].map((l, i, m) => {l.matrix = l.matrix(i, i / m.length); return l;})
             let layers = [];
-            let n = 10;
+            let n = 20;
             for (let i = 0; i < n; i++) {
                 let l = layer(soft_hill_gen2, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors));
                 l.matrix = l.matrix(i, i / n);
@@ -461,7 +461,7 @@ let genTime;
             let numRender = Math.min(pixelsToDrawn.length, 10000)
             // let rendered=[];
             for (let i = 0; i < numRender; i++) {
-                let index = randerRand.random(0,pixelsToDrawn.length-1)
+                let index = randerRand.randomInt(0,pixelsToDrawn.length)
                 let drawi = pixelsToDrawn[index]
                 pixelsToDrawn[index] = null
                 // let j = sb.randomInt(0,numRender)
@@ -524,22 +524,29 @@ let genTime;
                 // }
             }
             var i = pixelsToDrawn.length
+            let numDeleted = 0;
             while (i--) {
             
                 if (pixelsToDrawn[i]===null) {
                     pixelsToDrawn.splice(i, 1);
+                    numDeleted++;
                 }
             }
             // pixelsToDrawn= pixelsToDrawn.filter(i=>i!==null)
-            console.log(pixelsToDrawn.length)
+            console.log(pixelsToDrawn.length, numDeleted)
             
             // console.log({maxSs})
             p5.updatePixels()
 
-            // p5.noLoop()
-            // console.log("finished draw")
-            window.attributes = ({'hello': 'stew'});
-            window.previewReady = 1;
+            if(pixelsToDrawn.length===0){
+                p5.noLoop()
+
+                window.attributes = ({'hello': 'stew'});
+                window.previewReady = 1;
+                // console.log("finished draw")
+            }
+            
+            
             // console.log({previewReady})
 
         };
