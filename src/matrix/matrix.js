@@ -128,7 +128,7 @@ export const multiply=(matrices, point=[])=>{
             m = multiplyMatrices(m, matrix)
         }
     }catch (e) {
-        e;
+        throw   e;
     }
     return multiplyMatrixAndPoint(m,point)
 }
