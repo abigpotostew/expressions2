@@ -4,6 +4,8 @@ import {World} from "./gen-faces.js"
 import {PRNGRand} from "./random";
 import {colorFunctions, filterFunctions, mappingFunctions} from "./gen";
 import {rotateAroundZAxis, scaleMatrix, translationMatrix} from "./matrix/matrix";
+import {noiseFactory} from "./perlin";
+import {fbmFactory} from "./math";
 // import "p5/lib/addons/p5.dom";
 // // import "p5/lib/addons/p5.sound";	// Include if needed
 // import "./styles.scss";
@@ -50,6 +52,7 @@ const sketch = (p5) => {
 
             //todo the image doesn't complete on smaller screens in 150 loops
             if (newSeed || reset) {
+                p5.loop()
                 renderCount = 0;
                 randerRand = new PRNGRand(seed)
                 randerRand.random();
@@ -147,6 +150,22 @@ const sketch = (p5) => {
                 p5.color('#d6e6ea'),
             ],
                 [
+                p5.color('#493c24'),
+                p5.color('#464425'),
+
+                p5.color('#deceae'),
+                p5.color('#e7d4ae'),
+
+                p5.color('#98624f'),
+                p5.color('#b7a9a3'),
+
+                p5.color('#c6dce1'),
+                p5.color('#b7a9a3'),
+
+                p5.color('#c6dce1'),
+                p5.color('#2f1a02'),
+            ],
+                [
                     p5.color('#dc2918'),
                     p5.color('#600f0f'),
 
@@ -207,17 +226,21 @@ const sketch = (p5) => {
                 ]
 
             ]
-            const palette = p5.sb.randomList(palettes)
+            const palette = palettes[1];//p5.sb.randomList(palettes)
             const colors = palette;
             
-            const fbm = (v, offset = 0, scalar = 1) => {
-                let ss = p5.sin(v * 8 + offset) * 0.5
-                ss += p5.sin(v * 16 + offset) * 0.25
-                ss += p5.sin(v * 32 + offset) * 0.125
-                ss += p5.sin(v * 64 + offset) * 0.0625
-                ss *= scalar;
-                return ss;
-            }
+            const noise = noiseFactory()
+            noise.seed(p5.sb.randomInt(0, Number.MAX_SAFE_INTEGER))
+            const fbm = fbmFactory(p5, noise, 4, 2, .5)
+            
+            // const fbm = (v, offset = 0, scalar = 1) => {
+            //     let ss = p5.sin(v * 8 + offset) * 0.5
+            //     ss += p5.sin(v * 16 + offset) * 0.25
+            //     ss += p5.sin(v * 32 + offset) * 0.125
+            //     ss += p5.sin(v * 64 + offset) * 0.0625
+            //     ss *= scalar;
+            //     return ss;
+            // }
 
             const soft_hill_gen = (offset = 1) => {
                 const sy = p5.sb.random()
@@ -239,11 +262,11 @@ const sketch = (p5) => {
                     // ss += p5.sin(x * 40.28) * 0.04
                     // ss += 0;
                     // ss *= 0.25
-                    let ss = fbm(x, timeDraw, 0.4)
+                    let ss = fbm(x*1.0, 0.0)*verticalChaos;//timeDraw)
                     return [
                         // rotateAroundZAxis(0.1 + p5.sin(x * 3.28 + mouse[0] * 100))
                         //+ p5.sin(ss)*0.9+1.0 -1.5
-                        translationMatrix(0, Math.pow(x - 0.5, 2) + ss*2.0 +   (offset - .5), 0)
+                        translationMatrix(0, Math.pow(x - 0.5, 2) + ss +   (offset - .5), 0)
                         // , scaleMatrix(1, -0.01)
                     ]
                 }
@@ -252,31 +275,33 @@ const sketch = (p5) => {
             let timeDraw = genTime;
 
             let hill_offset;
-            if (p5.sb.random() > .5) {
+            if (p5.sb.random() > 1) {
                 // console.log('narrow hills')
                 hill_offset = p5.sb.random(4.4, 6.4);
             } else {
                 // console.log('wide hills')
-                hill_offset = p5.sb.random(4.0, 6.9);
+                hill_offset = p5.sb.random(0.0, 6.28);
             }
 
             //lower layer count is nice minimal
-            let numLayers = 20;
+            let numLayers = 400;
             const spread = 0.95 // smaller to show more of the layers! 0.01 good
-            const chaosFactor = .05252; //smaller is more alignment between layers
-            const verticalChaos = .125; // 0.125 less is more straight lines
+            const chaosFactor = .5252; //smaller is more alignment between layers
+            const verticalChaos = 0.18125; // 0.125 less is more straight lines
+            // const verticalChaos = 1.125; // 0.125 less is more straight lines
             const scatterSize = 0.000;
             // todo try different vertical + chaos factors for different layers
             // good between 0 and .5
             const soft_hill_gen2 = (offset) => {
                 const sy = hill_offset * p5.sb.random() * chaosFactor
                 return (x, y) => {
-                    let ss = p5.sin(x * 8 + timeDraw) * 0.5
-                    ss += p5.sin(x * 16 + timeDraw) * 0.25
-                    ss += p5.sin(x * 32 + timeDraw) * 0.125
-                    ss += p5.sin(x * 64 + timeDraw) * 0.0625
-                    ss *= verticalChaos;
-                    ss += sy;
+                    // let ss = p5.sin(x * 8 + timeDraw) * 0.5
+                    // ss += p5.sin(x * 16 + timeDraw) * 0.25
+                    // ss += p5.sin(x * 32 + timeDraw) * 0.125
+                    // ss += p5.sin(x * 64 + timeDraw) * 0.0625
+                    let ss = fbm(x, timeDraw)*verticalChaos
+                    // ss *= verticalChaos;
+                    // ss += sy;
 
                     const scatter = [p5.sb.random(scatterSize), p5.sb.random(scatterSize)]
                     return [
@@ -285,21 +310,23 @@ const sketch = (p5) => {
 
                         translationMatrix(-0.5, -0.5)
                         // , translationMatrix(0, -1.955+0.5*offset, 0)
-                        , translationMatrix(scatter[0], scatter[1] + spread * offset + -0.75, 0)
+                        , translationMatrix(scatter[0], scatter[1] + spread * offset + -0.9, 0)
                         , scaleMatrix(1, 3.125)
                     ]
                 }
             }
-            const soft_hill_gen_vertical = (offset) => {
+
+            const stratigrophy = (offset) => {
                 const sy = hill_offset * p5.sb.random() * chaosFactor
                 return (x, y) => {
-                    // can make more interesting pattersn if time draw changes
-                    let ss = p5.sin(x * 8 + timeDraw * sy) * 0.5
-                    ss += p5.sin(x * 16 + timeDraw * sy) * 0.25
-                    ss += p5.sin(x * 32 + timeDraw * sy) * 0.125
-                    ss += p5.sin(x * 64 + timeDraw * sy) * 0.0625
-                    ss *= verticalChaos;
-                    ss += sy;
+                    // let ss = p5.sin(x * 8 + timeDraw) * 0.5
+                    // ss += p5.sin(x * 16 + timeDraw) * 0.25
+                    // ss += p5.sin(x * 32 + timeDraw) * 0.125
+                    // ss += p5.sin(x * 64 + timeDraw) * 0.0625
+                    let ss = fbm(x, timeDraw + sy)*verticalChaos 
+                    // ss *= verticalChaos;
+                    // ss += sy;
+
                     const scatter = [p5.sb.random(scatterSize), p5.sb.random(scatterSize)]
                     return [
                         translationMatrix(.5, .5, 0),
@@ -307,7 +334,33 @@ const sketch = (p5) => {
 
                         translationMatrix(-0.5, -0.5)
                         // , translationMatrix(0, -1.955+0.5*offset, 0)
-                        , translationMatrix(scatter[0], scatter[1] + spread * offset + -0.75, 0)
+                        , translationMatrix(scatter[0], scatter[1] + spread * offset + -0.5, 0)
+                        , scaleMatrix(1, 1.)
+                    ]
+                }
+            }
+            
+            const soft_hill_gen_vertical = (offset) => {
+                
+                const sy = hill_offset * p5.sb.random() * chaosFactor
+                return (x, y) => {
+                    // can make more interesting pattersn if time draw changes
+                    let ss = fbm(x, timeDraw*sy)
+                    // let ss = p5.sin(x * 8 + timeDraw * sy) * 0.5
+                    // ss += p5.sin(x * 16 + timeDraw * sy) * 0.25
+                    // ss += p5.sin(x * 32 + timeDraw * sy) * 0.125
+                    // ss += p5.sin(x * 64 + timeDraw * sy) * 0.0625
+                    ss *= verticalChaos;
+                    ss += sy;
+                    
+                    const scatter = [p5.sb.random(scatterSize), p5.sb.random(scatterSize)]
+                    return [
+                        translationMatrix(.5, .5, 0),
+                        rotateAroundZAxis(ss),
+
+                        translationMatrix(-0.5, -0.5)
+                        // , translationMatrix(0, -1.955+0.5*offset, 0)
+                        , translationMatrix(scatter[0], scatter[1] + spread * offset + -0.95, 0)
                         , scaleMatrix(1, 3.125)
                     ]
                 }
@@ -328,10 +381,10 @@ const sketch = (p5) => {
             const colorsFg3 = [colors[6], colors[7], colors[7], colors[7]]
 
             const allColors = [
-                [colors[0], colors[1]],
-                [colors[2], colors[3], [], []],
-                [colors[4], colors[5], [], []],
-                [colors[6], colors[7], [], []],
+                [p5.color('#4b9603'),colors[0], colors[1], p5.color('#4b9603'), ],
+                [colors[2], colors[3], p5.color('#4b9603'),p5.color('#4b9603')],
+                [colors[4], colors[5], colors[4], colors[5]],
+                [colors[6], colors[7], colors[6], colors[7]],
             ];
             let bgLayers = [
                 layer(soft_hill_gen2, null, colorFunctions.twoGradientY, colorsBg),
@@ -341,18 +394,40 @@ const sketch = (p5) => {
                 return l;
             })
             let layers = [];
+            const layerTypesDef = {
+                steep_landscape: () => layer(steep_landscape, filterFunctions.isY_gt(.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
+                soft_hill: () => layer(soft_hill_gen2, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
+                stratigrophy: () => layer(stratigrophy, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
+                soft_hill_gen_vertical: () => layer(soft_hill_gen_vertical, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
+            }
+            const selectLayer = ()=> {
+                const re = p5.sb.randomWeighted(
+                    new Map([
+                        [layerTypesDef.steep_landscape, 0], 
+                        [ layerTypesDef.soft_hill, 0],
+                        [ layerTypesDef.stratigrophy, 40],
+                        [ layerTypesDef.soft_hill_gen_vertical, 0]
+                    ])
+                )
+                return re;
+            }
+            const layerTypes = new Array(numLayers).fill(0).map(()=>selectLayer())
             for (let i = 0; i < numLayers; i++) {
                 let l;
-                if (Math.floor(numLayers / 2) === i) {
-                    l = layer(steep_landscape, filterFunctions.isY_lt(.5), colorFunctions.twoGradientY, [p5.color(255), p5.color(0)]) //p5.sb.randomList(allColors)),
-                } 
-                // else if (i % 2 === 0) {
-                //     l = layer(soft_hill_gen_vertical, filterFunctions.isY_gt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors));
+                // // if (Math.floor(numLayers / 2) === i) {
+                // //     l = layer(steep_landscape, filterFunctions.isY_gt(.5), colorFunctions.twoGradientY, [p5.color(255), p5.color(0)]) //p5.sb.randomList(allColors)),
+                // // } 
+                // // else 
+                //     if (i % 2 === 0) {
+                //     // l = layer(soft_hill_gen_vertical, filterFunctions.isY_gt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors));
+                //         l = layer(steep_landscape, filterFunctions.isY_gt(.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors));//[p5.color(255), p5.color(0)]) //p5.sb.randomList(allColors)),
                 // }
-                else {
-                    l = layer(soft_hill_gen2, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors));
-                    l.index = i;
-                }
+                // else {
+                //     l = layer(soft_hill_gen2, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, p5.sb.randomList(allColors));
+                //     l.index = i;
+                // }
+                l = layerTypes[i]();
+                l.index=i;
                 layers.push(l)
             }
             // layers.push(layer(steep_landscape, filterFunctions.isY_gt(.5), colorFunctions.twoGradientY, [p5.color(0),p5.color(255)]))
@@ -378,11 +453,11 @@ const sketch = (p5) => {
             //     ]
             // }
 
-            layers.reverse()
+            // layers.reverse()
             //todo draw it over time using random point x, y
 
 
-            let pointSize = [p5.width * 0.001, p5.width * 0.004 * 1.2]
+            let pointSize = [p5.width * 0.0005, p5.width * 0.002 * 1.2].map(v=>v*3)
             p5.noStroke();
             // p5.noStroke();
             // p5.strokeWeight(0)
@@ -440,7 +515,7 @@ const sketch = (p5) => {
                     }
                 }
                 if (!color) {
-                    // drawPoint(x, y, bgColor)
+                    drawPoint(x, y, bgColor)
                 }
             }
 
