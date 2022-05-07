@@ -148,6 +148,27 @@ const twoGradientYRandomScatter_factory = (noise) => {
     }
 }
 
+const noiseOverlay_factory = (noise2DFieldOverlay, colorFunc) => {
+    return (p5, p, colors)=>{
+        let color = colorFunc(p5,p,colors)
+        if(!color) return color;
+        p = [...p].map(p=>2*p);
+        let n = noise2DFieldOverlay(p[0],p[1])*1
+        if(n > 0.15 && n < .18) {
+            n = p5.map(n,.15,.18,0,1)
+            if(n<.8){
+                n = p5.map(n,0,.8,0,1)
+            }else{
+                n = 1-p5.map(n,.8,1,0,1)
+            }
+            color = p5.lerpColor(color, p5.color(0), n)
+        }
+        return color;
+    }
+}
+
+
+
 
 const debug = (p5, p, colors) => {
     return p5.color(
@@ -161,4 +182,5 @@ export const colorFunctions = {
     twoGradientY, debug,
     twoGradientYRandomScatter,
     twoGradientYRandomScatter_factory,
+    noiseOverlay_factory
 }

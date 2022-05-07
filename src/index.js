@@ -5,7 +5,7 @@ import {PRNGRand} from "./random";
 import {colorFunctions, filterFunctions, mappingFunctions} from "./gen";
 import {rotateAroundZAxis, scaleMatrix, translationMatrix} from "./matrix/matrix";
 import {noiseFactory} from "./perlin";
-import {fbmFactory} from "./math";
+import {fbmFactory, fbmFactory2D} from "./math";
 // import "p5/lib/addons/p5.dom";
 // // import "p5/lib/addons/p5.sound";	// Include if needed
 // import "./styles.scss";
@@ -30,9 +30,11 @@ const sketch = (p5) => {
         let bodyPartsXML;
         let pixelsToDrawn;
         let randerRand;
+        let noiseFieldRand;
         let renderStyle = 0;
         let genTime;
         let renderCount = 0;
+        let maxRenders = 150;
         let polys = {};
         const resetPolys = () => {
             polys = {outline: [], fill: [], drawable: []}
@@ -67,6 +69,10 @@ const sketch = (p5) => {
 
             // seed=1648427511445;
             p5.sb = new PRNGRand(seed)
+
+            noiseFieldRand = new PRNGRand(seed)
+            noiseFieldRand.random();
+            noiseFieldRand.random();
 
             return;
 
@@ -332,7 +338,7 @@ bg:[ p5.color('#F94B42'),
             }
 
             //lower layer count is nice minimal
-            let numLayers = 10;
+            let numLayers = 50;
             const spread = 0.0 // smaller to show more of the layers! 0.01 good
             const chaosFactor = .5252 * 0.5; //smaller is more alignment between layers
             const verticalChaos = 0.18125; // 0.125 less is more straight lines
@@ -442,10 +448,11 @@ bg:[ p5.color('#F94B42'),
                     ]
                 }
             }
+            let minY=0, maxY = 0;
             const steep_single_vertical = (offset) => {
                 const spread = 0.002 // smaller to show more of the layers! 0.01 good
-                const chaosFactor = .5252 * 1.5; //smaller is more alignment between layers
-                const verticalChaos = 1.18125; // 0.125 less is more straight lines
+                const chaosFactor = .5252 * 15.5; //smaller is more alignment between layers
+                const verticalChaos = 17.18125; // 0.125 less is more straight lines
                 // const verticalChaos = 1.125; // 0.125 less is more straight lines
                 const scatterSize = 0.000;
                 const sy = hill_offset * p5.sb.random() * chaosFactor
@@ -458,15 +465,18 @@ bg:[ p5.color('#F94B42'),
                     // ss += p5.sin(x * 64 + timeDraw * sy) * 0.0625
                     ss *= verticalChaos;
                     ss += sy;
-                    let yy = 1-Math.pow(x - 0.5, 2) - 1.095 ;//+ ss + (offset*0);
+                    const width = 6;
+                    let yy = 1-Math.pow((x - 0.5)*5, 2) - 1.000  ;//+ ss + (offset*0);
+                    yy*=ss;
                     const scatter = [p5.sb.random(scatterSize), p5.sb.random(scatterSize)]
                     return [
-                        translationMatrix(.5, .5, 0),
-                        rotateAroundZAxis(0),
-                        translationMatrix(-0.5, -0.5)
+                        // translationMatrix(.5, .5, 0),
+                        // rotateAroundZAxis(0),
+                        // translationMatrix(-0.5, -0.5)
                         // , translationMatrix(0, -1.955+0.5*offset, 0)
-                        , translationMatrix(scatter[0], yy, 0)
-                        // , scaleMatrix(.1, 1.0)
+                        //pizza
+                         translationMatrix(-.2, yy-.1, 0)
+                        // , scaleMatrix(.8, 1.0)
                     ]
                 }
             }
@@ -491,20 +501,25 @@ bg:[ p5.color('#F94B42'),
                 [colors[4], colors[5], colors[4], colors[5]],
                 [colors[6], colors[7], colors[6], colors[7]],
             ];
+
+
+
+            const noise2OverlyaField = fbmFactory2D(p5, undefined, 4, 2, 1.5975)
+            const fbmColor = fbmFactory(p5, undefined, 4, 2, .5)
+
             let bgLayers = [
-                layer(soft_hill_gen2, null, colorFunctions.twoGradientY, colorsBg),
+                layer(soft_hill_gen2, null, colorFunctions.noiseOverlay_factory(noise2OverlyaField,colorFunctions.twoGradientY), colorsBg),
                 // layer(steep_landscape, filterFunctions.isY_lt(1.5), colorFunctions.twoGradientY, [p5.color(255),p5.color(0)]), //p5.sb.randomList(allColors)),
             ].map((l, i, m) => {
                 l.matrix = l.matrix(i / m.length);
                 return l;
             })
-            const fbmColor = fbmFactory(p5, undefined, 4, 2, .5)
             let layers = [];
             const layerTypesDef = {
                 steep_landscape: () => layer(steep_landscape, filterFunctions.isY_gt(.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
                 soft_hill: () => layer(soft_hill_gen2, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
                 stratigrophy: () => layer(stratigrophy, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
-                distant_lands: () => layer(distant_lands, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientYRandomScatter_factory(fbmColor), p5.sb.randomList(allColors)),
+                distant_lands: () => layer(distant_lands, filterFunctions.isY_gt(0.0), colorFunctions.noiseOverlay_factory(noise2OverlyaField,colorFunctions.twoGradientYRandomScatter_factory(fbmColor)), p5.sb.randomList(allColors)),
                 soft_hill_gen_vertical: () => layer(soft_hill_gen_vertical, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
                 steep_single_vertical: () => layer(steep_single_vertical, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
             }
@@ -567,11 +582,12 @@ bg:[ p5.color('#F94B42'),
             //todo draw it over time using random point x, y
 
 
-            let pointSize = [p5.width * 0.0005, p5.width * 0.002 * 1.2].map(v => v * 3)
+            const decreasingSize = (1- renderCount/maxRenders)
+            let pointSize = [p5.width * 0.0005 , p5.width * 0.002 * 1.2].map(v => v * 5 * decreasingSize)
             p5.noStroke();
             // p5.noStroke();
             // p5.strokeWeight(0)
-            const drawArc = true;
+            const drawArc = false;
             const drawPoint = (x, y, color) => {
 
                 p5.push()
@@ -589,7 +605,7 @@ bg:[ p5.color('#F94B42'),
                     p5.arc(x, y, r, r, sa, ea)
                 } else {
 
-                    const r = randerRand.random(pointSize[0], pointSize[1])
+                    const r = 3;//randerRand.random(pointSize[0], pointSize[1])
                     p5.noStroke();
                     p5.fill(color)
                     p5.ellipse(x, y, r)
@@ -681,7 +697,7 @@ bg:[ p5.color('#F94B42'),
 
                 // p5.updatePixels()
             }
-            let maxRenders = 250;
+
             if (renderCount++ === maxRenders) {
                 p5.noLoop()
                 console.log("done rendering")
