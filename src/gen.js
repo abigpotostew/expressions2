@@ -137,6 +137,17 @@ const twoGradientY = (p5, p, colors) => {
     return mapColorPairs(p5, p[1], colors);
 }
 
+const twoGradientYRandomScatter = (p5, p, colors) => {
+    return mapColorPairs(p5, p5.sb.random()*p[1], colors);
+}
+
+const twoGradientYRandomScatter_factory = (noise) => {
+    return (p5, p, colors)=>{
+        
+        return mapColorPairs(p5, noise(p[1]), colors);
+    }
+}
+
 
 const debug = (p5, p, colors) => {
     return p5.color(
@@ -147,5 +158,7 @@ const debug = (p5, p, colors) => {
 }
 
 export const colorFunctions = {
-    twoGradientY, debug
+    twoGradientY, debug,
+    twoGradientYRandomScatter,
+    twoGradientYRandomScatter_factory,
 }

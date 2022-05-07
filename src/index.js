@@ -138,101 +138,149 @@ const sketch = (p5) => {
             const mouse = [p5.mouseX / p5.width, p5.mouseY / p5.height];
             p5.normalizedMouse = mouse;
 
-            const palettes = [[
-                p5.color('#F94B42'),
-                p5.color('#ff5c39'),
+            const palettes = [
+                {
+bg:[ p5.color('#F94B42'),
+    p5.color('#ff5c39')],
+                    colors: [
+                        
+                        p5.color('#F94B42'),
+                        p5.color('#ff5c39'),
 
-                p5.color('#faa78a'),
-                p5.color('#fdf8f8'),
-                p5.color('#fdd05a'),
-                p5.color('#624086'),
-                p5.color('#c1e8f1'),
-                p5.color('#d6e6ea'),
-            ],
-                [
-                p5.color('#493c24'),
-                p5.color('#464425'),
+                        p5.color('#faa78a'),
+                        p5.color('#fdf8f8'),
 
-                p5.color('#deceae'),
-                p5.color('#e7d4ae'),
+                        p5.color('#72578f'),
+                        p5.color('#817191'),
+                        
+                        p5.color('#c1e8f1'),
+                        p5.color('#d6e6ea'),
+                    ]
+                },
+                {
+                    bg:[ p5.color('#F94B42'),
+                        p5.color('#ff5c39')],
+                    colors: [
+                        p5.color('#493c24'),
+                        p5.color('#464425'),
 
-                p5.color('#98624f'),
-                p5.color('#b7a9a3'),
+                        p5.color('#deceae'),
+                        p5.color('#e7d4ae'),
 
-                p5.color('#c6dce1'),
-                p5.color('#b7a9a3'),
+                        p5.color('#98624f'),
+                        p5.color('#b7a9a3'),
 
-                p5.color('#c6dce1'),
-                p5.color('#2f1a02'),
-            ],
-                [
-                    p5.color('#dc2918'),
-                    p5.color('#600f0f'),
+                        p5.color('#c6dce1'),
+                        p5.color('#b7a9a3'),
 
-                    p5.color('#ee3f02'),
-                    p5.color('#fa7f55'),
+                        p5.color('#c6dce1'),
+                        p5.color('#2f1a02'),
+                    ]
+                },
+                {
+                    bg:[ p5.color('#F94B42'),
+                        p5.color('#ff5c39')],
+                    colors: [
+                        p5.color('#493c24'),
+                        p5.color('#464425'),
 
-                    p5.color('#98624f'),
-                    p5.color('#b7a9a3'),
+                        p5.color('#deceae'),
+                        p5.color('#e7d4ae'),
 
-                    p5.color('#624086'),
-                    p5.color('#f5b81d'),
+                        p5.color('#4b9603'),
+                        p5.color('#4b9603'),
 
-                    p5.color('#c6dce1'),
-                    p5.color('#4d8d9d'),
-                ],
-                [
+                        p5.color('#c6dce1'),
+                        p5.color('#b7a9a3'),
 
-                    p5.color('#e3f1b2'),
-                    p5.color('#f3f8e2'),
+                        p5.color('#c6dce1'),
+                        p5.color('#2f1a02'),
+                    ]
+                },
+                {
+                    bg:[ p5.color('#F94B42'),
+                        p5.color('#ff5c39')],
+                    colors: [
+                        p5.color('#dc2918'),
+                        p5.color('#600f0f'),
 
-                    p5.color('#f3c0ae'),
-                    p5.color('#f3dddd'),
+                        p5.color('#ee3f02'),
+                        p5.color('#fa7f55'),
 
-                    p5.color('#624086'),
-                    p5.color('#fdd05a'),
+                        p5.color('#98624f'),
+                        p5.color('#b7a9a3'),
+
+                        p5.color('#72578f'),
+                        p5.color('#f5b81d'),
+
+                        p5.color('#c6dce1'),
+                        p5.color('#4d8d9d'),
+                    ]
+                },
+                {
+                    bg:[ p5.color('#F94B42'),
+                        p5.color('#ff5c39')],
+                    colors: [
+
+                        p5.color('#e3f1b2'),
+                        p5.color('#f3f8e2'),
+
+                        p5.color('#f3c0ae'),
+                        p5.color('#f3dddd'),
+
+                        p5.color('#624086'),
+                        p5.color('#fdd05a'),
 
 
-                    p5.color('#e3f1b2'),
-                    p5.color('#f3f8e2'),
-                ],
-                [
+                        p5.color('#e3f1b2'),
+                        p5.color('#f3f8e2'),
+                    ]
+                },
+                {
+                    bg:[ p5.color('#F94B42'),
+                        p5.color('#ff5c39')],
+                    colors: [
 
-                    p5.color('#484646'),
-                    p5.color('#232222'),
+                        p5.color('#484646'),
+                        p5.color('#232222'),
 
-                    p5.color('#d4f5d0'),
-                    p5.color('#ddf3f1'),
+                        p5.color('#d4f5d0'),
+                        p5.color('#ddf3f1'),
 
-                    p5.color('#6b1bc0'),
-                    p5.color('#9c50ec'),
+                        p5.color('#6b1bc0'),
+                        p5.color('#9c50ec'),
 
-                    p5.color('#ffffff'),
-                    p5.color('#e1dcc7'),
-                ],
-                [
+                        p5.color('#ffffff'),
+                        p5.color('#e1dcc7'),
+                    ]
+                },
+                {
+                    bg:[ p5.color('#F94B42'),
+                        p5.color('#ff5c39')],
+                    colors: [
 
-                    p5.color('#4b9603'),
-                    p5.color('#03965e'),
+                        p5.color('#4b9603'),
+                        p5.color('#03965e'),
 
-                    p5.color('#d4f5d0'),
-                    p5.color('#ddf3f1'),
+                        p5.color('#d4f5d0'),
+                        p5.color('#ddf3f1'),
 
-                    p5.color('#956cc0'),
-                    p5.color('#c19de7'),
+                        p5.color('#956cc0'),
+                        p5.color('#c19de7'),
 
-                    p5.color('#ffffff'),
-                    p5.color('#e1dcc7'),
-                ]
+                        p5.color('#ffffff'),
+                        p5.color('#e1dcc7'),
+                    ]
+                }
 
             ]
-            const palette = palettes[1];//p5.sb.randomList(palettes)
-            const colors = palette;
+            const palette =p5.sb.randomList(palettes)
+            const colors = palette.colors;
+            const bgColors = palette.bg;
+
             
-            const noise = noiseFactory()
-            noise.seed(p5.sb.randomInt(0, Number.MAX_SAFE_INTEGER))
-            const fbm = fbmFactory(p5, noise, 4, 2, .5)
-            
+            const fbm = fbmFactory(p5, undefined, 4, 2, .5)
+
             // const fbm = (v, offset = 0, scalar = 1) => {
             //     let ss = p5.sin(v * 8 + offset) * 0.5
             //     ss += p5.sin(v * 16 + offset) * 0.25
@@ -262,11 +310,11 @@ const sketch = (p5) => {
                     // ss += p5.sin(x * 40.28) * 0.04
                     // ss += 0;
                     // ss *= 0.25
-                    let ss = fbm(x*1.0, 0.0)*verticalChaos;//timeDraw)
+                    let ss = fbm(x * 1.0, 0.0) * verticalChaos;//timeDraw)
                     return [
                         // rotateAroundZAxis(0.1 + p5.sin(x * 3.28 + mouse[0] * 100))
                         //+ p5.sin(ss)*0.9+1.0 -1.5
-                        translationMatrix(0, Math.pow(x - 0.5, 2) + ss +   (offset - .5), 0)
+                        translationMatrix(0, Math.pow(x - 0.5, 2) + ss + (offset - .5), 0)
                         // , scaleMatrix(1, -0.01)
                     ]
                 }
@@ -284,9 +332,9 @@ const sketch = (p5) => {
             }
 
             //lower layer count is nice minimal
-            let numLayers = 400;
-            const spread = 0.95 // smaller to show more of the layers! 0.01 good
-            const chaosFactor = .5252; //smaller is more alignment between layers
+            let numLayers = 10;
+            const spread = 0.0 // smaller to show more of the layers! 0.01 good
+            const chaosFactor = .5252 * 0.5; //smaller is more alignment between layers
             const verticalChaos = 0.18125; // 0.125 less is more straight lines
             // const verticalChaos = 1.125; // 0.125 less is more straight lines
             const scatterSize = 0.000;
@@ -299,7 +347,7 @@ const sketch = (p5) => {
                     // ss += p5.sin(x * 16 + timeDraw) * 0.25
                     // ss += p5.sin(x * 32 + timeDraw) * 0.125
                     // ss += p5.sin(x * 64 + timeDraw) * 0.0625
-                    let ss = fbm(x, timeDraw)*verticalChaos
+                    let ss = fbm(x, timeDraw) * verticalChaos
                     // ss *= verticalChaos;
                     // ss += sy;
 
@@ -323,7 +371,7 @@ const sketch = (p5) => {
                     // ss += p5.sin(x * 16 + timeDraw) * 0.25
                     // ss += p5.sin(x * 32 + timeDraw) * 0.125
                     // ss += p5.sin(x * 64 + timeDraw) * 0.0625
-                    let ss = fbm(x, timeDraw + sy)*verticalChaos 
+                    let ss = fbm(x, timeDraw + sy) * verticalChaos * sy * 2;
                     // ss *= verticalChaos;
                     // ss += sy;
 
@@ -334,25 +382,29 @@ const sketch = (p5) => {
 
                         translationMatrix(-0.5, -0.5)
                         // , translationMatrix(0, -1.955+0.5*offset, 0)
-                        , translationMatrix(scatter[0], scatter[1] + spread * offset + -0.5, 0)
+                        , translationMatrix(scatter[0], scatter[1] + spread * offset + 0, 0)
                         , scaleMatrix(1, 1.)
                     ]
                 }
             }
-            
-            const soft_hill_gen_vertical = (offset) => {
-                
+
+            // create some with same props, and others with more chaos.
+            const distant_lands = (offset) => {
+                const spread = 0.02 // smaller to show more of the layers! 0.01 good
+                const chaosFactor = .5252 * 0.5; //smaller is more alignment between layers
+                const verticalChaos = 0.18125; // 0.125 less is more straight lines
+                // const verticalChaos = 1.125; // 0.125 less is more straight lines
+                const scatterSize = 0.000;
                 const sy = hill_offset * p5.sb.random() * chaosFactor
                 return (x, y) => {
-                    // can make more interesting pattersn if time draw changes
-                    let ss = fbm(x, timeDraw*sy)
-                    // let ss = p5.sin(x * 8 + timeDraw * sy) * 0.5
-                    // ss += p5.sin(x * 16 + timeDraw * sy) * 0.25
-                    // ss += p5.sin(x * 32 + timeDraw * sy) * 0.125
-                    // ss += p5.sin(x * 64 + timeDraw * sy) * 0.0625
-                    ss *= verticalChaos;
-                    ss += sy;
-                    
+                    // let ss = p5.sin(x * 8 + timeDraw) * 0.5
+                    // ss += p5.sin(x * 16 + timeDraw) * 0.25
+                    // ss += p5.sin(x * 32 + timeDraw) * 0.125
+                    // ss += p5.sin(x * 64 + timeDraw) * 0.0625
+                    let ss = fbm(x, timeDraw) * verticalChaos * sy * 2;
+                    // ss *= verticalChaos;
+                    // ss += sy;
+
                     const scatter = [p5.sb.random(scatterSize), p5.sb.random(scatterSize)]
                     return [
                         translationMatrix(.5, .5, 0),
@@ -360,8 +412,61 @@ const sketch = (p5) => {
 
                         translationMatrix(-0.5, -0.5)
                         // , translationMatrix(0, -1.955+0.5*offset, 0)
+                        , translationMatrix(scatter[0], scatter[1] + spread * offset + 0, 0)
+                        , scaleMatrix(1, 1.)
+                    ]
+                }
+            }
+
+            const soft_hill_gen_vertical = (offset) => {
+
+                const sy = hill_offset * p5.sb.random() * chaosFactor
+                return (x, y) => {
+                    // can make more interesting pattersn if time draw changes
+                    let ss = fbm(x, timeDraw * sy)
+                    // let ss = p5.sin(x * 8 + timeDraw * sy) * 0.5
+                    // ss += p5.sin(x * 16 + timeDraw * sy) * 0.25
+                    // ss += p5.sin(x * 32 + timeDraw * sy) * 0.125
+                    // ss += p5.sin(x * 64 + timeDraw * sy) * 0.0625
+                    ss *= verticalChaos;
+                    ss += sy;
+
+                    const scatter = [p5.sb.random(scatterSize), p5.sb.random(scatterSize)]
+                    return [
+                        translationMatrix(.5, .5, 0),
+                        rotateAroundZAxis(ss),
+                        translationMatrix(-0.5, -0.5)
+                        // , translationMatrix(0, -1.955+0.5*offset, 0)
                         , translationMatrix(scatter[0], scatter[1] + spread * offset + -0.95, 0)
                         , scaleMatrix(1, 3.125)
+                    ]
+                }
+            }
+            const steep_single_vertical = (offset) => {
+                const spread = 0.002 // smaller to show more of the layers! 0.01 good
+                const chaosFactor = .5252 * 1.5; //smaller is more alignment between layers
+                const verticalChaos = 1.18125; // 0.125 less is more straight lines
+                // const verticalChaos = 1.125; // 0.125 less is more straight lines
+                const scatterSize = 0.000;
+                const sy = hill_offset * p5.sb.random() * chaosFactor
+                return (x, y) => {
+                    // can make more interesting pattersn if time draw changes
+                    let ss = fbm(x, timeDraw * sy)
+                    // let ss = p5.sin(x * 8 + timeDraw * sy) * 0.5
+                    // ss += p5.sin(x * 16 + timeDraw * sy) * 0.25
+                    // ss += p5.sin(x * 32 + timeDraw * sy) * 0.125
+                    // ss += p5.sin(x * 64 + timeDraw * sy) * 0.0625
+                    ss *= verticalChaos;
+                    ss += sy;
+                    let yy = 1-Math.pow(x - 0.5, 2) - 1.095 ;//+ ss + (offset*0);
+                    const scatter = [p5.sb.random(scatterSize), p5.sb.random(scatterSize)]
+                    return [
+                        translationMatrix(.5, .5, 0),
+                        rotateAroundZAxis(0),
+                        translationMatrix(-0.5, -0.5)
+                        // , translationMatrix(0, -1.955+0.5*offset, 0)
+                        , translationMatrix(scatter[0], yy, 0)
+                        // , scaleMatrix(.1, 1.0)
                     ]
                 }
             }
@@ -375,14 +480,14 @@ const sketch = (p5) => {
                 }
             }
 
-            const colorsBg = [colors[0], colors[1]]
+            const colorsBg = bgColors;//[colors[0], colors[1]]
             const colorsFg = [colors[2], colors[3], colors[3], colors[3]]
             const colorsFg2 = [colors[4], colors[5], colors[5], colors[5]]
             const colorsFg3 = [colors[6], colors[7], colors[7], colors[7]]
 
             const allColors = [
-                [p5.color('#4b9603'),colors[0], colors[1], p5.color('#4b9603'), ],
-                [colors[2], colors[3], p5.color('#4b9603'),p5.color('#4b9603')],
+                [colors[0], colors[1], colors[0], colors[1],],
+                [colors[2], colors[3], colors[2], colors[3],],
                 [colors[4], colors[5], colors[4], colors[5]],
                 [colors[6], colors[7], colors[6], colors[7]],
             ];
@@ -393,25 +498,29 @@ const sketch = (p5) => {
                 l.matrix = l.matrix(i / m.length);
                 return l;
             })
+            const fbmColor = fbmFactory(p5, undefined, 4, 2, .5)
             let layers = [];
             const layerTypesDef = {
                 steep_landscape: () => layer(steep_landscape, filterFunctions.isY_gt(.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
                 soft_hill: () => layer(soft_hill_gen2, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
                 stratigrophy: () => layer(stratigrophy, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
+                distant_lands: () => layer(distant_lands, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientYRandomScatter_factory(fbmColor), p5.sb.randomList(allColors)),
                 soft_hill_gen_vertical: () => layer(soft_hill_gen_vertical, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
+                steep_single_vertical: () => layer(steep_single_vertical, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
             }
-            const selectLayer = ()=> {
+            const selectLayer = () => {
                 const re = p5.sb.randomWeighted(
                     new Map([
-                        [layerTypesDef.steep_landscape, 0], 
-                        [ layerTypesDef.soft_hill, 0],
-                        [ layerTypesDef.stratigrophy, 40],
-                        [ layerTypesDef.soft_hill_gen_vertical, 0]
+                        [layerTypesDef.steep_landscape, 0],
+                        [layerTypesDef.soft_hill, 0],
+                        [layerTypesDef.stratigrophy, 0],
+                        [layerTypesDef.distant_lands, 40],
+                        [layerTypesDef.soft_hill_gen_vertical, 0]
                     ])
                 )
                 return re;
             }
-            const layerTypes = new Array(numLayers).fill(0).map(()=>selectLayer())
+            const layerTypes = new Array(numLayers).fill(0).map(() => selectLayer())
             for (let i = 0; i < numLayers; i++) {
                 let l;
                 // // if (Math.floor(numLayers / 2) === i) {
@@ -427,10 +536,11 @@ const sketch = (p5) => {
                 //     l.index = i;
                 // }
                 l = layerTypes[i]();
-                l.index=i;
+                l.index = i;
                 layers.push(l)
             }
             // layers.push(layer(steep_landscape, filterFunctions.isY_gt(.5), colorFunctions.twoGradientY, [p5.color(0),p5.color(255)]))
+            layers.push(layer(steep_single_vertical, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, [p5.color(0),p5.color(255)]))
             layers.forEach((l, i, m) => {
                 l.matrix = l.matrix(i / m.length);
             })
@@ -457,11 +567,11 @@ const sketch = (p5) => {
             //todo draw it over time using random point x, y
 
 
-            let pointSize = [p5.width * 0.0005, p5.width * 0.002 * 1.2].map(v=>v*3)
+            let pointSize = [p5.width * 0.0005, p5.width * 0.002 * 1.2].map(v => v * 3)
             p5.noStroke();
             // p5.noStroke();
             // p5.strokeWeight(0)
-            const drawArc = false;
+            const drawArc = true;
             const drawPoint = (x, y, color) => {
 
                 p5.push()
