@@ -20,7 +20,7 @@ let traits = {};
 // window.getTraits = function(){
 //     return traits;
 // }
-
+const ratio = .66;
 const sketch = (p5) => {
         let millis = 0;
         let world = new World();
@@ -36,6 +36,9 @@ const sketch = (p5) => {
         let renderCount = 0;
         let maxRenders = 150;
         let polys = {};
+        let frameRatio = 0.02;
+        let frameWidth;
+        const borderColor = p5.color(0)
         const resetPolys = () => {
             polys = {outline: [], fill: [], drawable: []}
         };
@@ -54,6 +57,7 @@ const sketch = (p5) => {
 
             //todo the image doesn't complete on smaller screens in 150 loops
             if (newSeed || reset) {
+                frameWidth = p5.height * frameRatio;
                 p5.loop()
                 renderCount = 0;
                 randerRand = new PRNGRand(seed)
@@ -82,7 +86,15 @@ const sketch = (p5) => {
         p5.setup = () => {
             // Creating and positioning the canvas
             const s = Math.min(p5.windowHeight, p5.windowWidth) * canvasBorder
-            canvas = p5.createCanvas(s, s); // p5.windowWidth, p5.windowHeight);
+            let w, h = s;
+            w = h * ratio;
+            // if(p5.windowHeight>p5.windowWidth){
+            //     w = p5.windowHeight*ratio;
+            //     h =p5.windowHeight;
+            // }else{
+            //     h = p5.width
+            // }
+            canvas = p5.createCanvas(w, h); // p5.windowWidth, p5.windowHeight);
 
             p5.pixelDensity(1)
             // p5.colorMode(p5.HSB)
@@ -104,6 +116,7 @@ const sketch = (p5) => {
         p5.keyReleased = () => {
             if (p5.key === ' ') {
                 gen(true)
+                window.location = '?hash='+seed
                 p5.loop()
             }
             if (p5.key === 's') {
@@ -122,7 +135,10 @@ const sketch = (p5) => {
 // The sketch draw method
         p5.windowResized = () => {
             const s = Math.min(p5.windowHeight, p5.windowWidth) * canvasBorder
-            p5.resizeCanvas(s, s);
+            let w, h = s;
+            w = h * ratio;
+
+            p5.resizeCanvas(w, h);
             needsRender = true
             gen(false, true)
         };
@@ -146,26 +162,35 @@ const sketch = (p5) => {
 
             const palettes = [
                 {
-bg:[ p5.color('#F94B42'),
-    p5.color('#ff5c39')],
+                    bg: [
+                        p5.color('#F94B42'),
+                        p5.color('#ff5c39'),
+                        p5.color('#981f04'),
+                        p5.color('#722515'),
+                        p5.color('#721566'),
+                        p5.color('#8c041d'),
+                    ],
                     colors: [
-                        
+
                         p5.color('#F94B42'),
                         p5.color('#ff5c39'),
 
-                        p5.color('#faa78a'),
-                        p5.color('#fdf8f8'),
+                        p5.color('#be5b38'),
+                        p5.color('#ab411c'),
 
-                        p5.color('#72578f'),
-                        p5.color('#817191'),
-                        
-                        p5.color('#c1e8f1'),
-                        p5.color('#d6e6ea'),
+                        p5.color('#2f0260'),
+                        p5.color('#69428f'),
+
+                        p5.color('#e7c672'),
+                        p5.color('#eae1d6'),
+
+                        // p5.color('#c1e8f1'),
+                        // p5.color('#d6e6ea'),
                     ]
                 },
                 {
-                    bg:[ p5.color('#F94B42'),
-                        p5.color('#ff5c39')],
+                    bg: [p5.color('#F94B42'),
+                        p5.color('#f6c3b8')],
                     colors: [
                         p5.color('#493c24'),
                         p5.color('#464425'),
@@ -184,8 +209,8 @@ bg:[ p5.color('#F94B42'),
                     ]
                 },
                 {
-                    bg:[ p5.color('#F94B42'),
-                        p5.color('#ff5c39')],
+                    bg: [p5.color('#F94B42'),
+                        p5.color('#f6c3b8')],
                     colors: [
                         p5.color('#493c24'),
                         p5.color('#464425'),
@@ -204,8 +229,8 @@ bg:[ p5.color('#F94B42'),
                     ]
                 },
                 {
-                    bg:[ p5.color('#F94B42'),
-                        p5.color('#ff5c39')],
+                    bg: [p5.color('#F94B42'),
+                        p5.color('#f6c3b8')],
                     colors: [
                         p5.color('#dc2918'),
                         p5.color('#600f0f'),
@@ -224,8 +249,8 @@ bg:[ p5.color('#F94B42'),
                     ]
                 },
                 {
-                    bg:[ p5.color('#F94B42'),
-                        p5.color('#ff5c39')],
+                    bg: [p5.color('#F94B42'),
+                        p5.color('#f6c3b8')],
                     colors: [
 
                         p5.color('#e3f1b2'),
@@ -243,15 +268,15 @@ bg:[ p5.color('#F94B42'),
                     ]
                 },
                 {
-                    bg:[ p5.color('#F94B42'),
-                        p5.color('#ff5c39')],
+                    bg: [p5.color('#F94B42'),
+                        p5.color('#851913')],
                     colors: [
 
                         p5.color('#484646'),
                         p5.color('#232222'),
 
-                        p5.color('#d4f5d0'),
-                        p5.color('#ddf3f1'),
+                        p5.color('#3c92c7'),
+                        p5.color('#c9f6f2'),
 
                         p5.color('#6b1bc0'),
                         p5.color('#9c50ec'),
@@ -261,8 +286,8 @@ bg:[ p5.color('#F94B42'),
                     ]
                 },
                 {
-                    bg:[ p5.color('#F94B42'),
-                        p5.color('#ff5c39')],
+                    bg: [p5.color('#F94B42'),
+                        p5.color('#f6c3b8')],
                     colors: [
 
                         p5.color('#4b9603'),
@@ -280,11 +305,11 @@ bg:[ p5.color('#F94B42'),
                 }
 
             ]
-            const palette =p5.sb.randomList(palettes)
+            const palette =palettes[0];// p5.sb.randomList(palettes)
             const colors = palette.colors;
             const bgColors = palette.bg;
 
-            
+
             const fbm = fbmFactory(p5, undefined, 4, 2, .5)
 
             // const fbm = (v, offset = 0, scalar = 1) => {
@@ -338,9 +363,9 @@ bg:[ p5.color('#F94B42'),
             }
 
             //lower layer count is nice minimal
-            let numLayers = 50;
+            let numLayers = 100;
             const spread = 0.0 // smaller to show more of the layers! 0.01 good
-            const chaosFactor = .5252 * 0.5; //smaller is more alignment between layers
+            const chaosFactor = .5252 * 0.85; //smaller is more alignment between layers
             const verticalChaos = 0.18125; // 0.125 less is more straight lines
             // const verticalChaos = 1.125; // 0.125 less is more straight lines
             const scatterSize = 0.000;
@@ -353,7 +378,7 @@ bg:[ p5.color('#F94B42'),
                     // ss += p5.sin(x * 16 + timeDraw) * 0.25
                     // ss += p5.sin(x * 32 + timeDraw) * 0.125
                     // ss += p5.sin(x * 64 + timeDraw) * 0.0625
-                    let ss = fbm(x, timeDraw) * verticalChaos
+                    let ss = fbm(x*10, timeDraw * sy+ y*10) * verticalChaos
                     // ss *= verticalChaos;
                     // ss += sy;
 
@@ -362,10 +387,10 @@ bg:[ p5.color('#F94B42'),
                         translationMatrix(.5, .5, 0),
                         rotateAroundZAxis(ss),
 
-                        translationMatrix(-0.5, -0.5)
-                        // , translationMatrix(0, -1.955+0.5*offset, 0)
-                        , translationMatrix(scatter[0], scatter[1] + spread * offset + -0.9, 0)
-                        , scaleMatrix(1, 3.125)
+                        translationMatrix(-0.5, -0.5),
+                        // , translationMatrix(0, -1.955+0.5*offset, 0),
+                        translationMatrix(scatter[0], scatter[1] + spread * offset + -0.0, 0)
+                        // , scaleMatrix(1, 3.125)
                     ]
                 }
             }
@@ -394,22 +419,21 @@ bg:[ p5.color('#F94B42'),
                 }
             }
 
+            const xscaleoffset = p5.sb.random(-1.5, 1.5)
+            const yoffsetshared = p5.sb.random(-.15,.15)// trait: put this super high to have a single value
+            console.log({xscaleoffset, yoffsetshared})
             // create some with same props, and others with more chaos.
             const distant_lands = (offset) => {
-                const spread = 0.02 // smaller to show more of the layers! 0.01 good
-                const chaosFactor = .5252 * 0.5; //smaller is more alignment between layers
-                const verticalChaos = 0.18125; // 0.125 less is more straight lines
+                const spread = 0.2 // smaller to show more of the layers! 0.01 good
+                const chaosFactor = .5252 * 0.5 * p5.sb.random(); //smaller is more alignment between layers
+                const verticalChaos = 0.38125 * p5.sb.random(); // 0.125 less is more straight lines
                 // const verticalChaos = 1.125; // 0.125 less is more straight lines
-                const scatterSize = 0.000;
+                const scatterSize = 0.001;
                 const sy = hill_offset * p5.sb.random() * chaosFactor
+                const zOffset = p5.sb.random()
+                const offsetOffset = p5.sb.random() * offset
                 return (x, y) => {
-                    // let ss = p5.sin(x * 8 + timeDraw) * 0.5
-                    // ss += p5.sin(x * 16 + timeDraw) * 0.25
-                    // ss += p5.sin(x * 32 + timeDraw) * 0.125
-                    // ss += p5.sin(x * 64 + timeDraw) * 0.0625
                     let ss = fbm(x, timeDraw) * verticalChaos * sy * 2;
-                    // ss *= verticalChaos;
-                    // ss += sy;
 
                     const scatter = [p5.sb.random(scatterSize), p5.sb.random(scatterSize)]
                     return [
@@ -418,8 +442,8 @@ bg:[ p5.color('#F94B42'),
 
                         translationMatrix(-0.5, -0.5)
                         // , translationMatrix(0, -1.955+0.5*offset, 0)
-                        , translationMatrix(scatter[0], scatter[1] + spread * offset + 0, 0)
-                        , scaleMatrix(1, 1.)
+                        , translationMatrix(scatter[0], scatter[1] + spread * offsetOffset + yoffsetshared, 0)
+                        , scaleMatrix(xscaleoffset, 1., zOffset)
                     ]
                 }
             }
@@ -448,7 +472,7 @@ bg:[ p5.color('#F94B42'),
                     ]
                 }
             }
-            let minY=0, maxY = 0;
+            let minY = 0, maxY = 0;
             const steep_single_vertical = (offset) => {
                 const spread = 0.002 // smaller to show more of the layers! 0.01 good
                 const chaosFactor = .5252 * 15.5; //smaller is more alignment between layers
@@ -466,8 +490,8 @@ bg:[ p5.color('#F94B42'),
                     ss *= verticalChaos;
                     ss += sy;
                     const width = 6;
-                    let yy = 1-Math.pow((x - 0.5)*5, 2) - 1.000  ;//+ ss + (offset*0);
-                    yy*=ss;
+                    let yy = 1 - Math.pow((x - 0.5) * 5, 2) - 1.000;//+ ss + (offset*0);
+                    yy *= ss;
                     const scatter = [p5.sb.random(scatterSize), p5.sb.random(scatterSize)]
                     return [
                         // translationMatrix(.5, .5, 0),
@@ -475,7 +499,7 @@ bg:[ p5.color('#F94B42'),
                         // translationMatrix(-0.5, -0.5)
                         // , translationMatrix(0, -1.955+0.5*offset, 0)
                         //pizza
-                         translationMatrix(-.2, yy-.1, 0)
+                        translationMatrix(-.2, yy - .1, 0)
                         // , scaleMatrix(.8, 1.0)
                     ]
                 }
@@ -491,24 +515,23 @@ bg:[ p5.color('#F94B42'),
             }
 
             const colorsBg = bgColors;//[colors[0], colors[1]]
-            const colorsFg = [colors[2], colors[3], colors[3], colors[3]]
-            const colorsFg2 = [colors[4], colors[5], colors[5], colors[5]]
-            const colorsFg3 = [colors[6], colors[7], colors[7], colors[7]]
+            // const colorsFg = [colors[2], colors[3], colors[2], colors[3]]
+            // const colorsFg2 = [colors[4], colors[5], colors[4], colors[5]]
+            // const colorsFg3 = [colors[6], colors[7], colors[6], colors[7]]
 
             const allColors = [
-                [colors[0], colors[1], colors[0], colors[1],],
-                [colors[2], colors[3], colors[2], colors[3],],
-                [colors[4], colors[5], colors[4], colors[5]],
-                [colors[6], colors[7], colors[6], colors[7]],
+                [colors[0], colors[1], colors[0], colors[1], colors[0], colors[1]],
+                [colors[2], colors[3], colors[2], colors[3], colors[2], colors[3]],
+                [colors[4], colors[5], colors[4], colors[5], colors[4], colors[5]],
+                [colors[6], colors[7], colors[6], colors[7], colors[6], colors[7]],
             ];
 
-
-
-            const noise2OverlyaField = fbmFactory2D(p5, undefined, 4, 2, 1.5975)
-            const fbmColor = fbmFactory(p5, undefined, 4, 2, .5)
+            const noise2OverlyaField = fbmFactory2D(p5, undefined, 4, 2, .85975)
+            const fbmColor = fbmFactory(p5, undefined, 6, 4, .75)
+            const fbmColorBg = fbmFactory(p5, undefined, 6, 2, .75)
 
             let bgLayers = [
-                layer(soft_hill_gen2, null, colorFunctions.noiseOverlay_factory(noise2OverlyaField,colorFunctions.twoGradientY), colorsBg),
+                layer(soft_hill_gen2, null, colorFunctions.twoGradientYRandomScatter_factory(fbmColorBg), colorsBg),
                 // layer(steep_landscape, filterFunctions.isY_lt(1.5), colorFunctions.twoGradientY, [p5.color(255),p5.color(0)]), //p5.sb.randomList(allColors)),
             ].map((l, i, m) => {
                 l.matrix = l.matrix(i / m.length);
@@ -519,7 +542,7 @@ bg:[ p5.color('#F94B42'),
                 steep_landscape: () => layer(steep_landscape, filterFunctions.isY_gt(.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
                 soft_hill: () => layer(soft_hill_gen2, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
                 stratigrophy: () => layer(stratigrophy, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
-                distant_lands: () => layer(distant_lands, filterFunctions.isY_gt(0.0), colorFunctions.noiseOverlay_factory(noise2OverlyaField,colorFunctions.twoGradientYRandomScatter_factory(fbmColor)), p5.sb.randomList(allColors)),
+                distant_lands: () => layer(distant_lands, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientYRandomScatter_factory(fbmColor), p5.sb.randomList(allColors)),
                 soft_hill_gen_vertical: () => layer(soft_hill_gen_vertical, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
                 steep_single_vertical: () => layer(steep_single_vertical, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
             }
@@ -555,9 +578,9 @@ bg:[ p5.color('#F94B42'),
                 layers.push(l)
             }
             // layers.push(layer(steep_landscape, filterFunctions.isY_gt(.5), colorFunctions.twoGradientY, [p5.color(0),p5.color(255)]))
-            layers.push(layer(steep_single_vertical, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, [p5.color(0),p5.color(255)]))
+            // layers.push(layer(steep_single_vertical, filterFunctions.isY_gt(0.0), colorFunctions.twoGradientY, [p5.color(0),p5.color(255)]))
             layers.forEach((l, i, m) => {
-                l.matrix = l.matrix(i / m.length);
+                l.matrix = l.matrix(i / m.length + (1 / m.length * p5.sb.random()));
             })
             // let layers = [
             //     layer(soft_hill_gen2, filterFunctions.isY_lt(0.5), colorFunctions.twoGradientY, p5.sb.randomList(allColors)),
@@ -582,13 +605,22 @@ bg:[ p5.color('#F94B42'),
             //todo draw it over time using random point x, y
 
 
-            const decreasingSize = (1- renderCount/maxRenders)
-            let pointSize = [p5.width * 0.0005 , p5.width * 0.002 * 1.2].map(v => v * 5 * decreasingSize)
+            const applyBorder=(x,y, color)=>{
+                if(x<frameWidth || x > p5.width-frameWidth || y < frameWidth || y > p5.height-frameWidth){
+                    return p5.lerpColor(color, p5.color(borderColor), 0.5);
+                }
+                return color
+            }
+
+            const decreasingSize = (1 - renderCount / maxRenders)
+            let pointSize = [p5.width * 0.0005, p5.width * 0.002 * 1.2].map(v => v * 5 * decreasingSize)
             p5.noStroke();
             // p5.noStroke();
             // p5.strokeWeight(0)
             const drawArc = false;
             const drawPoint = (x, y, color) => {
+
+                color=applyBorder(x,y,color)
 
                 p5.push()
                 // p5.stroke(0)
@@ -604,15 +636,12 @@ bg:[ p5.color('#F94B42'),
                     const ea = randerRand.random(0.0, p5.TWO_PI)
                     p5.arc(x, y, r, r, sa, ea)
                 } else {
-
-                    const r = 3;//randerRand.random(pointSize[0], pointSize[1])
+                    const r = randerRand.random(pointSize[0], pointSize[1]);
                     p5.noStroke();
                     p5.fill(color)
                     p5.ellipse(x, y, r)
-
                 }
                 p5.pop()
-                // p5.set(x, y, color)
             }
             const renderFn = (x, y) => {
                 let p, color;

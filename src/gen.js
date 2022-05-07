@@ -143,23 +143,34 @@ const twoGradientYRandomScatter = (p5, p, colors) => {
 
 const twoGradientYRandomScatter_factory = (noise) => {
     return (p5, p, colors)=>{
-        
         return mapColorPairs(p5, noise(p[1]), colors);
     }
 }
 
+let range = [1000,-1000]
 const noiseOverlay_factory = (noise2DFieldOverlay, colorFunc) => {
     return (p5, p, colors)=>{
         let color = colorFunc(p5,p,colors)
         if(!color) return color;
-        p = [...p].map(p=>2*p);
-        let n = noise2DFieldOverlay(p[0],p[1])*1
-        if(n > 0.15 && n < .18) {
-            n = p5.map(n,.15,.18,0,1)
+        const p1 = [...p].map(p=>20*p);
+        const p2 = [...p1].map(p=>1*p + 100000);
+        let n = noise2DFieldOverlay(p1[0],p1[1])*1
+        let n2 =noise2DFieldOverlay(p2[0],p2[1])*1
+        n = n+n2;
+        let ran=[.5,1.5]
+        if(n<range[0]){
+            range[0]=n
+        }
+        if(n>range[1]){
+            range[1]=n
+        }
+        if(n > ran[0] && n < ran[1]) {
+            let edge = .9;
+            n = p5.map(n,ran[0],ran[1],0,1)
             if(n<.8){
-                n = p5.map(n,0,.8,0,1)
+                n = p5.map(n,0,edge,0,1)
             }else{
-                n = 1-p5.map(n,.8,1,0,1)
+                n = 1-p5.map(n,edge,1,0,1)
             }
             color = p5.lerpColor(color, p5.color(0), n)
         }
