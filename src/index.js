@@ -175,17 +175,41 @@ const sketch = (p5) => {
                         p5.color('#F94B42'),
                         p5.color('#ff5c39'),
 
-                        p5.color('#be5b38'),
-                        p5.color('#ab411c'),
+                        p5.color('#0c0c3d'),
+                        p5.color('#0b0b5e'),
 
                         p5.color('#2f0260'),
-                        p5.color('#69428f'),
+                        p5.color('#200241'),
 
-                        p5.color('#e7c672'),
-                        p5.color('#eae1d6'),
+                        p5.color('#e0bc70'),
+                        p5.color('#d29c2c'),
 
-                        // p5.color('#c1e8f1'),
-                        // p5.color('#d6e6ea'),
+                    ]
+                },
+                {
+                    name:'blues',
+                    bg: [
+                        p5.color('#78a5f5'),
+                        p5.color('#3988ff'),
+                        p5.color('#045f98'),
+                        p5.color('#153d72'),
+                        p5.color('#155972'),
+                        p5.color('#044f8c'),
+                    ],
+                    colors: [
+
+                        p5.color('#1a76ee'),
+                        p5.color('#2771ad'),
+
+                        p5.color('#0c0c3d'),
+                        p5.color('#0b0b5e'),
+
+                        p5.color('#050260'),
+                        p5.color('#200241'),
+
+                        p5.color('#e3d85a'),
+                        p5.color('#d29c2c'),
+
                     ]
                 },
                 {
@@ -305,7 +329,7 @@ const sketch = (p5) => {
                 }
 
             ]
-            const palette =palettes[0];// p5.sb.randomList(palettes)
+            const palette =palettes[1];// p5.sb.randomList(palettes)
             const colors = palette.colors;
             const bgColors = palette.bg;
 
