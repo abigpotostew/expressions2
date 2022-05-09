@@ -3,9 +3,10 @@ import p5 from "p5";
 import {World} from "./gen-faces.js"
 import {PRNGRand} from "./random";
 import {colorFunctions, filterFunctions, mappingFunctions} from "./gen";
-import {rotateAroundZAxis, scaleMatrix, translationMatrix} from "./matrix/matrix";
+import {rotateAroundYAxis, rotateAroundZAxis, scaleMatrix, translationMatrix} from "./matrix/matrix";
 import {noiseFactory} from "./perlin";
 import {fbmFactory, fbmFactory2D} from "./math";
+import {namedPalettes} from "./palettes";
 // import "p5/lib/addons/p5.dom";
 // // import "p5/lib/addons/p5.sound";	// Include if needed
 // import "./styles.scss";
@@ -34,10 +35,10 @@ const sketch = (p5) => {
         let renderStyle = 0;
         let genTime;
         let renderCount = 0;
-        let maxRenders = 150;
+        let maxRenders = 350;
         let polys = {};
-        let frameRatio = 0.02;
-        let frameWidth;
+        let frameRatio = 0.01;
+        let frameWidth,frameWidthOuter;
         const borderColor = p5.color(0)
         const resetPolys = () => {
             polys = {outline: [], fill: [], drawable: []}
@@ -58,6 +59,7 @@ const sketch = (p5) => {
             //todo the image doesn't complete on smaller screens in 150 loops
             if (newSeed || reset) {
                 frameWidth = p5.height * frameRatio;
+                frameWidthOuter = frameWidth*.25;
                 p5.loop()
                 renderCount = 0;
                 randerRand = new PRNGRand(seed)
@@ -82,12 +84,24 @@ const sketch = (p5) => {
 
         };
 
+        const getWindowSize = () => {
+            const s = Math.min(p5.windowHeight, p5.windowWidth) * canvasBorder
+            let w, h;
+            if (ratio > 1) {
+                w = s;
+                h = w * (ratio - 1);
+            } else {
+                h = s;
+                w = h * ratio;
+            }
+
+            return [w, h]
+        }
+
         let canvas; //p5 canvas
         p5.setup = () => {
             // Creating and positioning the canvas
-            const s = Math.min(p5.windowHeight, p5.windowWidth) * canvasBorder
-            let w, h = s;
-            w = h * ratio;
+            const [w, h] = getWindowSize()
             // if(p5.windowHeight>p5.windowWidth){
             //     w = p5.windowHeight*ratio;
             //     h =p5.windowHeight;
@@ -116,7 +130,7 @@ const sketch = (p5) => {
         p5.keyReleased = () => {
             if (p5.key === ' ') {
                 gen(true)
-                window.location = '?hash='+seed
+                window.location = '?hash=' + seed
                 p5.loop()
             }
             if (p5.key === 's') {
@@ -134,9 +148,7 @@ const sketch = (p5) => {
 
 // The sketch draw method
         p5.windowResized = () => {
-            const s = Math.min(p5.windowHeight, p5.windowWidth) * canvasBorder
-            let w, h = s;
-            w = h * ratio;
+            let [w, h] = getWindowSize();
 
             p5.resizeCanvas(w, h);
             needsRender = true
@@ -187,7 +199,7 @@ const sketch = (p5) => {
                     ]
                 },
                 {
-                    name:'blues',
+                    name: 'blues',
                     bg: [
                         p5.color('#78a5f5'),
                         p5.color('#3988ff'),
@@ -195,6 +207,12 @@ const sketch = (p5) => {
                         p5.color('#153d72'),
                         p5.color('#155972'),
                         p5.color('#044f8c'),
+                        p5.color('#031b2f'),
+                        p5.color('#1c1544'),
+                        p5.color('#f1b62e'),
+                        p5.color('#938a7e'),
+                        p5.color('#78a5f5'),
+                        p5.color('#3988ff'),
                     ],
                     colors: [
 
@@ -329,21 +347,18 @@ const sketch = (p5) => {
                 }
 
             ]
-            const palette =palettes[1];// p5.sb.randomList(palettes)
+            // const palette = palettes[1];// p5.sb.randomList(palettes)
+            const namedpalettesall=namedPalettes(p5);
+            const paletteName = p5.sb.randomList(Object.keys(namedpalettesall));
+            const palette = namedpalettesall[paletteName];// p5.sb.randomList(palettes)
             const colors = palette.colors;
             const bgColors = palette.bg;
 
 
-            const fbm = fbmFactory(p5, undefined, 4, 2, .5)
+            const fbmOctaves = p5.sb.randomInt(2,8);
+            const fbm = fbmFactory(p5, undefined, fbmOctaves, 2, .5)
 
-            // const fbm = (v, offset = 0, scalar = 1) => {
-            //     let ss = p5.sin(v * 8 + offset) * 0.5
-            //     ss += p5.sin(v * 16 + offset) * 0.25
-            //     ss += p5.sin(v * 32 + offset) * 0.125
-            //     ss += p5.sin(v * 64 + offset) * 0.0625
-            //     ss *= scalar;
-            //     return ss;
-            // }
+            const fbmDrawPoint = fbmFactory2D(p5, undefined, 4, 2, .5)
 
             const soft_hill_gen = (offset = 1) => {
                 const sy = p5.sb.random()
@@ -360,11 +375,6 @@ const sketch = (p5) => {
             const steep_landscape = (offset = 1) => {
                 const sy = p5.sb.random() * 0.1
                 return (x, y) => {
-                    // let ss = p5.sin(x * 10.28) * 0.2
-                    // ss += p5.sin(x * 20.28) * 0.07
-                    // ss += p5.sin(x * 40.28) * 0.04
-                    // ss += 0;
-                    // ss *= 0.25
                     let ss = fbm(x * 1.0, 0.0) * verticalChaos;//timeDraw)
                     return [
                         // rotateAroundZAxis(0.1 + p5.sin(x * 3.28 + mouse[0] * 100))
@@ -387,7 +397,7 @@ const sketch = (p5) => {
             }
 
             //lower layer count is nice minimal
-            let numLayers = 100;
+            let numLayers = 0;
             const spread = 0.0 // smaller to show more of the layers! 0.01 good
             const chaosFactor = .5252 * 0.85; //smaller is more alignment between layers
             const verticalChaos = 0.18125; // 0.125 less is more straight lines
@@ -395,25 +405,72 @@ const sketch = (p5) => {
             const scatterSize = 0.000;
             // todo try different vertical + chaos factors for different layers
             // good between 0 and .5
+
+            const traitsGen = {
+
+            }
+
             const soft_hill_gen2 = (offset) => {
-                const sy = hill_offset * p5.sb.random() * chaosFactor
+                const spread = 0.0 // smaller to show more of the layers! 0.01 good
+                const chaosFactor = p5.sb.random() * 200.9; //smaller is more alignment between layers
+                const verticalChaos = 1.9518125* p5.sb.random()  ; // 0.125 less is more straight lines
+
+
+                // const verticalChaos = 1.125; // 0.125 less is more straight lines
+                const scatterSize =(p5.sb.random()>0.9?0.0001:0.0) ;
+                const sy = hill_offset *chaosFactor
+                const extraRotation = p5.sb.random()*6.28;
+                const extraXBasedRotation = 0
+                traitsGen.extraRotation=extraRotation;
+                traitsGen.hill_offset=hill_offset;
+                traitsGen.scatterSize=scatterSize;
+                traitsGen.verticalChaos=verticalChaos;
+                traitsGen.scatterSize=scatterSize;
+                traitsGen.spread=spread;
+                traitsGen.bgColor=paletteName;
+                traitsGen.extraXBasedRotation=extraXBasedRotation;
+
+
+
+                const buckets = Math.floor(Math.pow(p5.sb.random(),.5)*8);
+                const similarity = p5.sb.random(0,.5);
+                const xBucketOffset = p5.sb.random(-.5,.5)
+                const yBucketOffset = p5.sb.random(-.5,.5)
+                const bucketOffsets = new Array(buckets*buckets).fill(0).map((v,i,a)=>{
+                    if(p5.sb.random()>similarity){
+                        return [0,0]
+                    }else {
+                        return [xBucketOffset,yBucketOffset]
+                    }
+                })
+                traitsGen.buckets=buckets*buckets;
+                traitsGen.bucketSimilarity=similarity;
+
                 return (x, y) => {
                     // let ss = p5.sin(x * 8 + timeDraw) * 0.5
                     // ss += p5.sin(x * 16 + timeDraw) * 0.25
                     // ss += p5.sin(x * 32 + timeDraw) * 0.125
                     // ss += p5.sin(x * 64 + timeDraw) * 0.0625
-                    let ss = fbm(x*10, timeDraw * sy+ y*10) * verticalChaos
+
+                    let ex
+                    let ss = fbm(x * 10, timeDraw * sy + y * 10) * verticalChaos
                     // ss *= verticalChaos;
                     // ss += sy;
 
                     const scatter = [p5.sb.random(scatterSize), p5.sb.random(scatterSize)]
+                    const xbucket = Math.floor((x*buckets));
+                    const ybucket = Math.floor((y*buckets));
+                    const  bucketOffset= bucketOffsets[xbucket*ybucket+xbucket];
+
                     return [
                         translationMatrix(.5, .5, 0),
-                        rotateAroundZAxis(ss),
+                        rotateAroundZAxis(ss+ fbm(extraXBasedRotation*x)),
+                        rotateAroundYAxis(extraRotation ),
 
                         translationMatrix(-0.5, -0.5),
+                        translationMatrix(xbucket*bucketOffset[0], ybucket*bucketOffset[1],0),
                         // , translationMatrix(0, -1.955+0.5*offset, 0),
-                        translationMatrix(scatter[0], scatter[1] + spread * offset + -0.0, 0)
+                        translationMatrix(scatter[0] , scatter[1] + spread * offset + -0.5 , 0)
                         // , scaleMatrix(1, 3.125)
                     ]
                 }
@@ -444,8 +501,8 @@ const sketch = (p5) => {
             }
 
             const xscaleoffset = p5.sb.random(-1.5, 1.5)
-            const yoffsetshared = p5.sb.random(-.15,.15)// trait: put this super high to have a single value
-            console.log({xscaleoffset, yoffsetshared})
+            const yoffsetshared = p5.sb.random(-.15, .15)// trait: put this super high to have a single value
+            // console.log({xscaleoffset, yoffsetshared})
             // create some with same props, and others with more chaos.
             const distant_lands = (offset) => {
                 const spread = 0.2 // smaller to show more of the layers! 0.01 good
@@ -629,41 +686,55 @@ const sketch = (p5) => {
             //todo draw it over time using random point x, y
 
 
-            const applyBorder=(x,y, color)=>{
-                if(x<frameWidth || x > p5.width-frameWidth || y < frameWidth || y > p5.height-frameWidth){
+            const applyBorder = (x, y, color) => {
+                if (x < frameWidth || x > p5.width - frameWidth || y < frameWidth || y > p5.height - frameWidth) {
+                    if (x < frameWidthOuter || x > p5.width - frameWidthOuter || y < frameWidthOuter || y > p5.height - frameWidthOuter) {
+                        return color;
+                    }
                     return p5.lerpColor(color, p5.color(borderColor), 0.5);
                 }
                 return color
             }
 
-            const decreasingSize = (1 - renderCount / maxRenders)
-            let pointSize = [p5.width * 0.0005, p5.width * 0.002 * 1.2].map(v => v * 5 * decreasingSize)
+            const decreasingSize = (1 - renderCount / maxRenders)-.55;
+            const minPointSize = p5.width * 0.0025;
+            let pointSize = [p5.width * 0.0005, p5.width * 0.002 * 1.2]
+                .map(v => v * 10 * decreasingSize + p5.width * 0.00025)
+                .map(v=>Math.max(v,minPointSize))
             p5.noStroke();
             // p5.noStroke();
             // p5.strokeWeight(0)
             const drawArc = false;
+            const drawStyle=2;
             const drawPoint = (x, y, color) => {
 
-                color=applyBorder(x,y,color)
+                color = applyBorder(x, y, color)
 
                 p5.push()
                 // p5.stroke(0)
                 const r = randerRand.random(pointSize[0], pointSize[1])
+
                 // const r2 = randerRand.random(pointSize[0],pointSize[1])
                 // p5.noStroke();
 
-                if (drawArc) {
+                if (drawStyle===0) {
                     p5.stroke(color)
                     p5.noFill()
                     const sa = randerRand.random(0.0, p5.TWO_PI)
                     randerRand.random()
                     const ea = randerRand.random(0.0, p5.TWO_PI)
                     p5.arc(x, y, r, r, sa, ea)
-                } else {
+                } else if(drawStyle===1) {
                     const r = randerRand.random(pointSize[0], pointSize[1]);
                     p5.noStroke();
                     p5.fill(color)
                     p5.ellipse(x, y, r)
+                }else if(drawStyle===2){
+                    const lx =fbmDrawPoint(x,y)
+                    const ly =fbmDrawPoint(x*2,y*2)
+                    p5.stroke(color)
+                    p5.noFill(color)
+                    p5.line(x,y,x+lx,x+ly)
                 }
                 p5.pop()
             }
@@ -751,8 +822,22 @@ const sketch = (p5) => {
                 // p5.updatePixels()
             }
 
+            const printTraits = ()=>{
+                console.log("--- Start Traits ----")
+                Object.keys(traitsGen).sort().forEach((k)=>{
+                    console.log(k, traitsGen[k])
+                })
+                console.log("--- End Traits ----")
+            }
+            if(renderCount===1){
+                printTraits()
+            }
+
             if (renderCount++ === maxRenders) {
                 p5.noLoop()
+                window.attributes = (traitsGen);
+                window.previewReady = 1;
+                printTraits()
                 console.log("done rendering")
             }
 
