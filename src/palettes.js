@@ -25,6 +25,31 @@ export const palettes = (p5) => [
         ]
     },
     {
+        bg: [
+            p5.color('#F94B42'),
+            p5.color('#ff5c39'),
+            p5.color('#981f04'),
+            p5.color('#722515'),
+            p5.color('#721566'),
+            p5.color('#8c041d'),
+        ],
+        colors: [
+
+            p5.color('#F94B42'),
+            p5.color('#ff5c39'),
+
+            p5.color('#0c0c3d'),
+            p5.color('#0b0b5e'),
+
+            p5.color('#2f0260'),
+            p5.color('#200241'),
+
+            p5.color('#e0bc70'),
+            p5.color('#d29c2c'),
+
+        ]
+    },
+    {
         name: 'blues',
         bg: [
             p5.color('#78a5f5'),
@@ -177,6 +202,21 @@ export const palettes = (p5) => [
 export const namedPalettes = (p5) => {
     return {
         ['reds']: {
+            bg: [
+                p5.color('#ab1008'),
+                p5.color('#ff5c39'),
+                p5.color('#981f04'),
+                p5.color('#722515'),
+                p5.color('#9b1f18'),
+                p5.color('#d38929'),
+                p5.color('#52180b'),
+                p5.color('#722515'),
+                p5.color('#721566'),
+                p5.color('#8c041d'),
+            ],
+            colors: [],
+        },
+        ['space']: {
             bg: [
                 p5.color('#ab1008'),
                 p5.color('#ff5c39'),

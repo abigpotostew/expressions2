@@ -35,9 +35,9 @@ const sketch = (p5) => {
         let renderStyle = 0;
         let genTime;
         let renderCount = 0;
-        let maxRenders = 350;
+        let maxRenders = 150;
         let polys = {};
-        let frameRatio = 0.01;
+        let frameRatio = 0.02;
         let frameWidth,frameWidthOuter;
         const borderColor = p5.color(0)
         const resetPolys = () => {
@@ -113,8 +113,8 @@ const sketch = (p5) => {
             p5.pixelDensity(1)
             // p5.colorMode(p5.HSB)
             canvas.parent("sketch");
-            // p5.smooth(8);
-            p5.noSmooth()
+            p5.smooth(8);
+            // p5.noSmooth()
             //
             const seedQp = new URL(window.location.href).searchParams.get("hash")
 
@@ -348,7 +348,7 @@ const sketch = (p5) => {
 
             ]
             // const palette = palettes[1];// p5.sb.randomList(palettes)
-            const namedpalettesall=namedPalettes(p5);
+            const namedpalettesall='space';//namedPalettes(p5);
             const paletteName = p5.sb.randomList(Object.keys(namedpalettesall));
             const palette = namedpalettesall[paletteName];// p5.sb.randomList(palettes)
             const colors = palette.colors;
@@ -358,7 +358,7 @@ const sketch = (p5) => {
             const fbmOctaves = p5.sb.randomInt(2,8);
             const fbm = fbmFactory(p5, undefined, fbmOctaves, 2, .5)
 
-            const fbmDrawPoint = fbmFactory2D(p5, undefined, 4, 2, .5)
+            const fbmDrawPoint = fbmFactory2D(p5, undefined, 8, 1.5, .67175)
 
             const soft_hill_gen = (offset = 1) => {
                 const sy = p5.sb.random()
@@ -460,7 +460,7 @@ const sketch = (p5) => {
                     const scatter = [p5.sb.random(scatterSize), p5.sb.random(scatterSize)]
                     const xbucket = Math.floor((x*buckets));
                     const ybucket = Math.floor((y*buckets));
-                    const  bucketOffset= bucketOffsets[xbucket*ybucket+xbucket];
+                    const  bucketOffset= Math.min(bucketOffsets[xbucket*ybucket+xbucket],bucketOffsets.length-1);
 
                     return [
                         translationMatrix(.5, .5, 0),
@@ -564,10 +564,6 @@ const sketch = (p5) => {
                 return (x, y) => {
                     // can make more interesting pattersn if time draw changes
                     let ss = fbm(x, timeDraw * sy)
-                    // let ss = p5.sin(x * 8 + timeDraw * sy) * 0.5
-                    // ss += p5.sin(x * 16 + timeDraw * sy) * 0.25
-                    // ss += p5.sin(x * 32 + timeDraw * sy) * 0.125
-                    // ss += p5.sin(x * 64 + timeDraw * sy) * 0.0625
                     ss *= verticalChaos;
                     ss += sy;
                     const width = 6;
@@ -696,7 +692,15 @@ const sketch = (p5) => {
                 return color
             }
 
+            const increasingBrightnessHalf = (renderCount / maxRenders)*.5;
             const decreasingSize = (1 - renderCount / maxRenders)-.55;
+            
+            const minLineWeight = p5.width*.005
+            const lineWeight = Math.max(minLineWeight,1 - renderCount / maxRenders * minLineWeight * 5)
+            
+            const minLineLength = p5.width *.06*.25
+            const lineLength = Math.max(minLineLength, (1 - renderCount / maxRenders) * minLineLength * 5)
+                
             const minPointSize = p5.width * 0.0025;
             let pointSize = [p5.width * 0.0005, p5.width * 0.002 * 1.2]
                 .map(v => v * 10 * decreasingSize + p5.width * 0.00025)
@@ -705,10 +709,12 @@ const sketch = (p5) => {
             // p5.noStroke();
             // p5.strokeWeight(0)
             const drawArc = false;
-            const drawStyle=2;
+            const drawStyle=1;
+            const colorfbmoffset = p5.sb.random(0,10000)
             const drawPoint = (x, y, color) => {
 
                 color = applyBorder(x, y, color)
+                color = p5.lerpColor(p5.color(0),color,increasingBrightnessHalf+0.5)
 
                 p5.push()
                 // p5.stroke(0)
@@ -730,11 +736,15 @@ const sketch = (p5) => {
                     p5.fill(color)
                     p5.ellipse(x, y, r)
                 }else if(drawStyle===2){
-                    const lx =fbmDrawPoint(x,y)
-                    const ly =fbmDrawPoint(x*2,y*2)
+                    const xi = x/p5.width*.75;
+                    const yi = y/p5.height*.75;
+                    const lx =fbmDrawPoint(xi,yi)*lineLength
+                    const ly =fbmDrawPoint(xi+colorfbmoffset,yi+colorfbmoffset)*lineLength
                     p5.stroke(color)
                     p5.noFill(color)
-                    p5.line(x,y,x+lx,x+ly)
+                    p5.strokeWeight(lineWeight);
+                    p5.strokeCap(p5.ROUND)
+                    p5.line(x,y,x+lx,y+ly)
                 }
                 p5.pop()
             }
@@ -810,7 +820,7 @@ const sketch = (p5) => {
             } else if (renderStyle === 0) {
                 // p5.loadPixels()
                 //.004 is the render speed
-                let speed = 1.125;
+                let speed = .5125;
                 let numRender = Math.floor(.004 * speed * p5.width * p5.height);
                 for (let i = 0; i < numRender; i++) {
                     let x = randerRand.randomInt(0, p5.width);
