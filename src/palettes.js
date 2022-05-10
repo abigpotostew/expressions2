@@ -218,12 +218,14 @@ export const namedPalettes = (p5) => {
         },
         ['space']: {
             bg: [
-                p5.color('#ab1008'),
-                p5.color('#ff5c39'),
+                p5.color('#060413'),
+                p5.color('#09031a'),
+                p5.color('#0f0e18'),
+                p5.color('#120e1c'),
                 p5.color('#981f04'),
                 p5.color('#722515'),
-                p5.color('#9b1f18'),
-                p5.color('#d38929'),
+                p5.color('#180605'),
+                p5.color('#eacf51'),
                 p5.color('#52180b'),
                 p5.color('#722515'),
                 p5.color('#721566'),

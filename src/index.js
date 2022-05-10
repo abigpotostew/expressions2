@@ -32,10 +32,11 @@ const sketch = (p5) => {
         let pixelsToDrawn;
         let randerRand;
         let noiseFieldRand;
-        let renderStyle = 0;
+        let renderStyle = 2;
+        let xstart=0;
         let genTime;
         let renderCount = 0;
-        let maxRenders = 150;
+        let maxRenders = 250;
         let polys = {};
         let frameRatio = 0.02;
         let frameWidth,frameWidthOuter;
@@ -348,8 +349,8 @@ const sketch = (p5) => {
 
             ]
             // const palette = palettes[1];// p5.sb.randomList(palettes)
-            const namedpalettesall='space';//namedPalettes(p5);
-            const paletteName = p5.sb.randomList(Object.keys(namedpalettesall));
+            const namedpalettesall=namedPalettes(p5);
+            const paletteName ='space';// p5.sb.randomList(Object.keys(namedpalettesall));
             const palette = namedpalettesall[paletteName];// p5.sb.randomList(palettes)
             const colors = palette.colors;
             const bgColors = palette.bg;
@@ -709,7 +710,7 @@ const sketch = (p5) => {
             // p5.noStroke();
             // p5.strokeWeight(0)
             const drawArc = false;
-            const drawStyle=1;
+            const drawStyle=3;
             const colorfbmoffset = p5.sb.random(0,10000)
             const drawPoint = (x, y, color) => {
 
@@ -745,6 +746,9 @@ const sketch = (p5) => {
                     p5.strokeWeight(lineWeight);
                     p5.strokeCap(p5.ROUND)
                     p5.line(x,y,x+lx,y+ly)
+                }else if(drawStyle===3){
+                    p5.stroke(color);
+                    p5.point(x,y)
                 }
                 p5.pop()
             }
@@ -777,6 +781,13 @@ const sketch = (p5) => {
                 if (!color) {
                     drawPoint(x, y, bgColor)
                 }
+            }
+            const printTraits = ()=>{
+                console.log("--- Start Traits ----")
+                Object.keys(traitsGen).sort().forEach((k)=>{
+                    console.log(k, traitsGen[k])
+                })
+                console.log("--- End Traits ----")
             }
 
             if (renderStyle === 1) {
@@ -817,7 +828,39 @@ const sketch = (p5) => {
                     window.previewReady = 1;
                     // console.log("finished draw")
                 }
-            } else if (renderStyle === 0) {
+            } else if (renderStyle === 2) {
+                // p5.loadPixels()
+
+                let x=xstart++,y;
+                
+                    for ( y = 0; y < p5.height; y++) {
+                        renderFn(x, y)
+                    }
+                
+                if(xstart>=p5.width){
+                     p5.noLoop()
+                    window.attributes = (traitsGen);
+                    window.previewReady = 1;
+                    printTraits()
+                    console.log("done rendering")
+                }
+                
+                // for (let i = 0; i < numRender; i++) {
+                //     let index = randerRand.randomInt(0, pixelsToDrawn.length)
+                //     let drawi = pixelsToDrawn[index]
+                //     pixelsToDrawn[index] = null
+                //     // let j = sb.randomInt(0,numRender)
+                //     let x = drawi % p5.width;
+                //     let y = (drawi - x) / p5.width;
+                //
+                //     renderFn(x, y)
+                //
+                // }
+
+                // p5.updatePixels()
+                
+            }
+            else if (renderStyle === 0) {
                 // p5.loadPixels()
                 //.004 is the render speed
                 let speed = .5125;
@@ -828,29 +871,23 @@ const sketch = (p5) => {
                     let y = randerRand.randomInt(0, p5.height);
                     renderFn(x, y)
                 }
+                if(renderCount===1){
+                    printTraits()
+                }
+
+                if (renderCount++ === maxRenders) {
+                    p5.noLoop()
+                    window.attributes = (traitsGen);
+                    window.previewReady = 1;
+                    printTraits()
+                    console.log("done rendering")
+                }
 
                 // p5.updatePixels()
             }
 
-            const printTraits = ()=>{
-                console.log("--- Start Traits ----")
-                Object.keys(traitsGen).sort().forEach((k)=>{
-                    console.log(k, traitsGen[k])
-                })
-                console.log("--- End Traits ----")
-            }
-            if(renderCount===1){
-                printTraits()
-            }
-
-            if (renderCount++ === maxRenders) {
-                p5.noLoop()
-                window.attributes = (traitsGen);
-                window.previewReady = 1;
-                printTraits()
-                console.log("done rendering")
-            }
-
+            
+           
 
             // console.log({previewReady})
 
